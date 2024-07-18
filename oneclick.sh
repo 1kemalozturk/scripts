@@ -1,48 +1,21 @@
 #!/bin/bash
 
-# Function to start the USBIP-Attach service
-usbip_attach_service_start() {
+usbip_attach_service() {
     clear
-    echo "Starting USBIP-Attach service..."
-    systemctl start usbip-attach.service
-    if [[ $? -eq 0 ]]; then
-        echo "USBIP-Attach service started successfully."
-    else
-        echo "Failed to start USBIP-Attach service."
-        echo "Please check the service status for more information:"
-        systemctl status usbip-attach.service
-    fi
-    sleep 10
-    show_main
-}
-
-# Function to stop the USBIP-Attach service
-usbip_attach_service_stop() {
-    clear
-    echo "Stopping USBIP-Attach service..."
-    systemctl stop usbip-attach.service
-    if [[ $? -eq 0 ]]; then
-        echo "USBIP-Attach service stopped successfully."
-    else
-        echo "Failed to stop USBIP-Attach service."
-        echo "Please check the service status for more information:"
-        systemctl status usbip-attach.service
-    fi
-    sleep 10
-    show_main
-}
-
-# Function to check the status of the USBIP-Attach service
-usbip_attach_service_status() {
-    clear
-    echo "Checking status of USBIP-Attach service..."
-    systemctl status usbip-attach.service
+    modprobe vhci-hcd
+    echo -n "Host/Server IP: "
+    read host_ip
+    echo -n "Host/Server BUSID: "
+    read bus_id
+    usbip attach -r "$host_ip" -b "$bus_id"
+    lsusb
+    echo "USB device attached from $host_ip with bus ID $bus_id."
     sleep 10
     show_main
 }
 
 # Function to create and configure the USBIP-Attach service
-usbip_attach_service_auto() {
+usbip_attach_service_install() {
     clear
     echo "Setting up USBIP-Attach service..."
 
@@ -120,6 +93,36 @@ usbip attach -r \"$host_ip\" -b \"$bus_id\"" | tee $script_file > /dev/null
     show_main
 }
 
+usbip_attach_service_uninstall() {
+    clear
+    echo "Removing USBIP-Attach service..."
+
+    # Stop the service if it's running
+    systemctl stop usbip-attach.service
+
+    # Disable the service to prevent it from starting on boot
+    systemctl disable usbip-attach.service
+
+    # Remove the service file
+    rm -f /etc/systemd/system/usbip-attach.service
+
+    # Reload the systemd daemon to apply changes
+    systemctl daemon-reload
+
+    echo "USBIP-Attach service removed successfully."
+    sleep 10
+    show_main
+}
+
+# Function to check the status of the USBIP-Attach service
+usbip_attach_service_status() {
+    clear
+    echo "Checking status of USBIP-Attach service..."
+    systemctl status usbip-attach.service
+    sleep 10
+    show_main
+}
+
 show_main() {
     clear
     echo "1. USBIP WSL/HYPERV"
@@ -168,22 +171,18 @@ usbip() {
 usbip_managment() {
     clear
     echo "USBIP WSL/HYPERV MANAGMENT"
-    echo "1. Attach"
-    echo "2. Attach Service Auto"
-    echo "3. Attach Service Start"
-    echo "4. Attach Service Stop"
-    echo "5. Attach Service Status"
+    echo "1. Attach Service Install"
+    echo "2. Attach Service Uninstall"
+    echo "3. Attach Service Status"
     echo "0. Back"
     echo -n "Choose an option: "
     read choice
     case $choice in
-        1) usbip_attach ;;
-        2) usbip_attach_service_auto ;;
-        3) usbip_attach_service_start ;;
-        4) usbip_attach_service_stop ;;
-        5) usbip_attach_service_status ;;
+        1) usbip_attach_service_install ;;
+        2) usbip_attach_service_uninstall ;;
+        3) usbip_attach_service_status ;;
         0) show_main ;;
-        *) echo "Invalid option!"; sleep 1; 3xui ;;
+        *) echo "Invalid option!"; sleep 1; usbip_managment ;;
     esac
 }
 
@@ -293,20 +292,6 @@ usbip_uninstall() {
     apt remove -y hwdata usbutils usbip linux-tools-virtual
     apt autoremove -y
     echo "USBIP uninstalled."
-    sleep 10
-    show_main
-}
-
-usbip_attach() {
-    clear
-    modprobe vhci-hcd
-    echo -n "Host/Server IP: "
-    read host_ip
-    echo -n "Host/Server BUSID: "
-    read bus_id
-    usbip attach -r "$host_ip" -b "$bus_id"
-    lsusb
-    echo "USB device attached from $host_ip with bus ID $bus_id."
     sleep 10
     show_main
 }
