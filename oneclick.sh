@@ -188,8 +188,8 @@ homeassistant_install() {
     clear
     echo "Installing Home Assistant..."
 
-    # `sudo su -` ile kök kullanıcısı olarak oturum açar ve komutları çalıştırır
-    sudo su - <<'EOF'
+    # `su -` ile kök kullanıcısı olarak oturum açar ve komutları çalıştırır
+    su - <<'EOF'
     cd /var/local
 
     # Paketleri yükle
