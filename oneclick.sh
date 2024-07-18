@@ -106,34 +106,34 @@ troubleshooting() {
 usbip_ubuntu_install() {
     clear
     echo "Installing USBIP on Ubuntu..."
-    sudo apt update
-    sudo apt install -y hwdata usbutils linux-tools-virtual
-    sudo update-alternatives --install /usr/local/bin/usbip usbip `ls /usr/lib/linux-tools/*/usbip | tail -n1` 20
-    sudo modprobe vhci-hcd
+    apt update
+    apt install -y hwdata usbutils linux-tools-virtual
+    update-alternatives --install /usr/local/bin/usbip usbip `ls /usr/lib/linux-tools/*/usbip | tail -n1` 20
+    modprobe vhci-hcd
     echo "USBIP installed on Ubuntu."
     sleep 2
-    usbip
+    show_main
 }
 
 usbip_debian_install() {
     clear
     echo "Installing USBIP on Debian..."
-    sudo apt update
-    sudo apt install -y hwdata usbutils usbip
-    sudo modprobe vhci-hcd
+    apt update
+    apt install -y hwdata usbutils usbip
+    modprobe vhci-hcd
     echo "USBIP installed on Debian."
     sleep 2
-    usbip
+    show_main
 }
 
 usbip_uninstall() {
     clear
     echo "Uninstalling USBIP..."
-    sudo apt remove -y hwdata usbutils usbip linux-tools-virtual
-    sudo apt autoremove -y
+    apt remove -y hwdata usbutils usbip linux-tools-virtual
+    apt autoremove -y
     echo "USBIP uninstalled."
     sleep 2
-    usbip
+    show_main
 }
 
 usbip_attach() {
@@ -142,11 +142,11 @@ usbip_attach() {
     read host_ip
     echo -n "Enter BUS ID: "
     read bus_id
-    sudo usbip attach -r "$host_ip" -b "$bus_id"
+    usbip attach -r "$host_ip" -b "$bus_id"
     lsusb
     echo "USB device attached from $host_ip with bus ID $bus_id."
     sleep 2
-    usbip
+    show_main
 }
 
 3xui_install() {
@@ -155,7 +155,7 @@ usbip_attach() {
     bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh)
     echo "3x-UI installed."
     sleep 2
-    3xui
+    show_main
 }
 
 3xui_uninstall() {
@@ -164,7 +164,7 @@ usbip_attach() {
     
     echo "3x-UI uninstalled."
     sleep 2
-    3xui
+    show_main
 }
 
 adguardhome_install() {
@@ -179,7 +179,7 @@ adguardhome_install() {
 adguardhome_uninstall() {
     clear
     echo "Uninstalling AdguardHome..."
-    sudo /opt/AdGuardHome/AdGuardHome -s uninstall
+    /opt/AdGuardHome/AdGuardHome -s uninstall
     echo "AdguardHome uninstalled."
     sleep 2
     show_main
@@ -217,7 +217,7 @@ homeassistant_install() {
 homeassistant_uninstall() {
     clear
     echo "Uninstalling Home Assistant..."
-    sudo dpkg -r os-agent
+    dpkg -r os-agent
     cd /var/local
     rm -fr os-agent_linux_x86_64.deb homeassistant-supervised.deb
     echo "Home Assistant uninstalled."
