@@ -1,5 +1,121 @@
 #!/bin/bash
 
+# Function to start the USBIP service
+usbip_attach_service_start() {
+    clear
+    echo "Starting USBIP service..."
+    sudo systemctl start usbip-attach.service
+    if [[ $? -eq 0 ]]; then
+        echo "USBIP service started successfully."
+    else
+        echo "Failed to start USBIP service."
+    fi
+    sleep 2
+    show_main
+}
+
+# Function to stop the USBIP service
+usbip_attach_service_stop() {
+    clear
+    echo "Stopping USBIP service..."
+    sudo systemctl stop usbip-attach.service
+    if [[ $? -eq 0 ]]; then
+        echo "USBIP service stopped successfully."
+    else
+        echo "Failed to stop USBIP service."
+    fi
+    sleep 2
+    show_main
+}
+
+# Function to check the status of the USBIP service
+usbip_attach_service_status() {
+    clear
+    echo "Checking status of USBIP service..."
+    sudo systemctl status usbip-attach.service
+    sleep 10
+    show_main
+}
+
+# Function to create and configure the USBIP service
+usbip_attach_service() {
+    clear
+    echo "Setting up USBIP service..."
+
+    # Prompt for IP and BUSID
+    echo -n "Host/Server IP: "
+    read host_ip
+    echo -n "Host/Server BUSID: "
+    read bus_id
+
+    # Check if the inputs are not empty
+    if [[ -z "$host_ip" || -z "$bus_id" ]]; then
+        echo "Host/Server IP or BUSID cannot be empty."
+        sleep 2
+        show_main
+        return
+    fi
+
+    # Create the systemd service file
+    service_file="/etc/systemd/system/usbip-attach.service"
+    script_file="/usr/local/bin/usbip-attach.sh"
+
+    echo "[Unit]
+Description=USBIP Attach Service
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=$script_file
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target" | sudo tee $service_file > /dev/null
+
+    # Check if the service file was created successfully
+    if [[ $? -ne 0 ]]; then
+        echo "Failed to create service file."
+        sleep 2
+        show_main
+        return
+    fi
+
+    # Create the attach script
+    echo "#!/bin/bash
+
+# Load USBIP kernel module
+modprobe vhci-hcd
+
+# Attach USB device
+usbip attach -r \"$host_ip\" -b \"$bus_id\"" | sudo tee $script_file > /dev/null
+
+    # Check if the script file was created successfully
+    if [[ $? -ne 0 ]]; then
+        echo "Failed to create attach script."
+        sleep 2
+        show_main
+        return
+    fi
+
+    # Make the script executable
+    sudo chmod +x $script_file
+
+    # Reload systemd, enable, and start the service
+    sudo systemctl daemon-reload
+    sudo systemctl enable usbip-attach.service
+    sudo systemctl start usbip-attach.service
+
+    # Check if the service was started successfully
+    if [[ $? -eq 0 ]]; then
+        echo "USBIP service setup completed successfully."
+    else
+        echo "Failed to start USBIP service."
+    fi
+
+    sleep 5
+    show_main
+}
+
 show_main() {
     clear
     echo "1. USBIP WSL/HYPERV"
@@ -31,7 +147,7 @@ usbip() {
     echo "1. Ubuntu Install"
     echo "2. Debian Install"
     echo "3. Uninstall"
-    echo "4. Attach"
+    echo "4. Managment"
     echo "0. Back"
     echo -n "Choose an option: "
     read choice
@@ -39,9 +155,31 @@ usbip() {
         1) usbip_ubuntu_install ;;
         2) usbip_debian_install ;;
         3) usbip_uninstall ;;
-        4) usbip_attach ;;
+        4) usbip_managment ;;
         0) show_main ;;
         *) echo "Invalid option!"; sleep 1; usbip ;;
+    esac
+}
+
+usbip_managment() {
+    clear
+    echo "USBIP WSL/HYPERV MANAGMENT"
+    echo "1. Attach"
+    echo "2. Attach Service Auto Start"
+    echo "3. Attach Service Start"
+    echo "4. Attach Service Stop"
+    echo "5. Attach Service Status"
+    echo "0. Back"
+    echo -n "Choose an option: "
+    read choice
+    case $choice in
+        1) usbip_attach ;;
+        2) usbip_attach_service ;;
+        3) usbip_attach_service_start ;;
+        4) usbip_attach_service_stop ;;
+        5) usbip_attach_service_stop ;;
+        0) show_main ;;
+        *) echo "Invalid option!"; sleep 1; 3xui ;;
     esac
 }
 
