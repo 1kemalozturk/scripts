@@ -188,11 +188,7 @@ homeassistant_install() {
     clear
     echo "Installing Home Assistant..."
 
-    # `su -` ile kök kullanıcısı olarak oturum açar ve komutları çalıştırır
-    su - <<'EOF'
     cd /var/local
-
-    # Paketleri yükle
     apt update
     apt install -y \
         apparmor \
@@ -217,7 +213,6 @@ homeassistant_install() {
     wget -O homeassistant-supervised.deb https://github.com/home-assistant/supervised-installer/releases/latest/download/homeassistant-supervised.deb
     apt install -y ./os-agent_linux_x86_64.deb
     apt install -y ./homeassistant-supervised.deb
-EOF
 
     echo "Home Assistant installed."
     sleep 10
@@ -227,8 +222,8 @@ EOF
 homeassistant_uninstall() {
     clear
     echo "Uninstalling Home Assistant..."
-    apt-get remove --purge docker-ce docker-ce-cli containerd.io
-    apt remove \
+    apt-get remove -y --purge docker-ce docker-ce-cli containerd.io
+    apt remove -y \
     apparmor \
     cifs-utils \
     dbus \
@@ -240,9 +235,9 @@ homeassistant_uninstall() {
     systemd-journal-remote \
     systemd-resolved \
     udisks2 \
-    os-agent -y
+    os-agent
     rm -fr /var/local/os-agent_linux_x86_64.deb /var/local/homeassistant-supervised.deb /var/lib/docker /var/lib/containerd
-    apt-get autoremove
+    apt-get -y autoremove
     echo "Home Assistant uninstalled."
     sleep 10
     show_main
