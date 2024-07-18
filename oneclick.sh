@@ -216,9 +216,20 @@ homeassistant_install() {
 homeassistant_uninstall() {
     clear
     echo "Uninstalling Home Assistant..."
-    dpkg -r os-agent
-    cd /var/local
-    rm -fr os-agent_linux_x86_64.deb homeassistant-supervised.deb
+    apt remove \
+    apparmor \
+    cifs-utils \
+    dbus \
+    jq \
+    libglib2.0-bin \
+    lsb-release \
+    network-manager \
+    nfs-common \
+    systemd-journal-remote \
+    systemd-resolved \
+    udisks2 \
+    os-agent -y
+    rm -fr /var/local/os-agent_linux_x86_64.deb /var/local/homeassistant-supervised.deb
     echo "Home Assistant uninstalled."
     sleep 10
     show_main
