@@ -4,13 +4,13 @@
 usbip_attach_service_start() {
     clear
     echo "Starting USBIP-Attach service..."
-    sudo systemctl start usbip-attach.service
+    systemctl start usbip-attach.service
     if [[ $? -eq 0 ]]; then
         echo "USBIP-Attach service started successfully."
     else
         echo "Failed to start USBIP-Attach service."
         echo "Please check the service status for more information:"
-        sudo systemctl status usbip-attach.service
+        systemctl status usbip-attach.service
     fi
     sleep 10
     show_main
@@ -20,13 +20,13 @@ usbip_attach_service_start() {
 usbip_attach_service_stop() {
     clear
     echo "Stopping USBIP-Attach service..."
-    sudo systemctl stop usbip-attach.service
+    systemctl stop usbip-attach.service
     if [[ $? -eq 0 ]]; then
         echo "USBIP-Attach service stopped successfully."
     else
         echo "Failed to stop USBIP-Attach service."
         echo "Please check the service status for more information:"
-        sudo systemctl status usbip-attach.service
+        systemctl status usbip-attach.service
     fi
     sleep 10
     show_main
