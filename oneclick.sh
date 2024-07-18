@@ -111,7 +111,7 @@ usbip_ubuntu_install() {
     update-alternatives --install /usr/local/bin/usbip usbip `ls /usr/lib/linux-tools/*/usbip | tail -n1` 20
     modprobe vhci-hcd
     echo "USBIP installed on Ubuntu."
-    sleep 2
+    sleep 10
     show_main
 }
 
@@ -122,7 +122,7 @@ usbip_debian_install() {
     apt install -y hwdata usbutils usbip
     modprobe vhci-hcd
     echo "USBIP installed on Debian."
-    sleep 2
+    sleep 10
     show_main
 }
 
@@ -132,7 +132,7 @@ usbip_uninstall() {
     apt remove -y hwdata usbutils usbip linux-tools-virtual
     apt autoremove -y
     echo "USBIP uninstalled."
-    sleep 2
+    sleep 10
     show_main
 }
 
@@ -145,7 +145,7 @@ usbip_attach() {
     usbip attach -r "$host_ip" -b "$bus_id"
     lsusb
     echo "USB device attached from $host_ip with bus ID $bus_id."
-    sleep 2
+    sleep 10
     show_main
 }
 
@@ -154,7 +154,7 @@ usbip_attach() {
     echo "Installing 3x-UI..."
     bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh)
     echo "3x-UI installed."
-    sleep 2
+    sleep 10
     show_main
 }
 
@@ -163,7 +163,7 @@ usbip_attach() {
     echo "Uninstalling 3x-UI..."
     
     echo "3x-UI uninstalled."
-    sleep 2
+    sleep 10
     show_main
 }
 
@@ -172,7 +172,7 @@ adguardhome_install() {
     echo "Installing AdguardHome loading..."
     curl -s -S -L https://raw.githubusercontent.com/AdguardTeam/AdGuardHome/master/scripts/install.sh | sh -s -- -v
     echo "AdguardHome installed."
-    sleep 2
+    sleep 10
     show_main
 }
 
@@ -182,7 +182,7 @@ adguardhome_uninstall() {
     /opt/AdGuardHome/AdGuardHome -s uninstall
     rm -fr /opt/AdGuardHome
     echo "AdguardHome uninstalled."
-    sleep 2
+    sleep 10
     show_main
 }
 
@@ -211,7 +211,7 @@ homeassistant_install() {
     wget -O homeassistant-supervised.deb https://github.com/home-assistant/supervised-installer/releases/latest/download/homeassistant-supervised.deb
     apt install ./os-agent_linux_x86_64.deb
     apt install ./homeassistant-supervised.deb
-    sleep 2
+    sleep 10
     show_main
 }
 
@@ -222,7 +222,7 @@ homeassistant_uninstall() {
     cd /var/local
     rm -fr os-agent_linux_x86_64.deb homeassistant-supervised.deb
     echo "Home Assistant uninstalled."
-    sleep 2
+    sleep 10
     show_main
 }
 
@@ -231,7 +231,7 @@ troubleshooting_dpkg_fix() {
     dpkg --force-all --configure -a
     apt --fix-broken install
     apt-get -f install
-    sleep 2
+    sleep 10
     show_main
 }
 
