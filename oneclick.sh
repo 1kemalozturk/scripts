@@ -8,6 +8,7 @@ show_main() {
     echo "4. Home Assistant"
     echo "5. Troubleshooting"
     echo "6. System Info"
+    echo "7. Check for Updates"
     echo "0. Exit Script"
     echo -n "Choose an option: "
     read choice
@@ -18,6 +19,7 @@ show_main() {
         4) homeassistant ;;
         5) troubleshooting ;;
         6) systeminfo ;;
+        7) check_for_updates ;;
         0) exit 0 ;;
         *) echo "Invalid option!"; sleep 1; show_main ;;
     esac
@@ -312,6 +314,34 @@ systeminfo_checkPort() {
     ss -lntp | grep "$checkPort"
     sleep 10
     show_main
+}
+
+check_for_updates() {
+    clear
+    echo "Checking for updates..."
+    
+    # URL of the raw script from the GitHub repository
+    script_url="https://raw.githubusercontent.com/1kemalozturk/scripts/main/oneclick.sh"
+    
+    # Temp file to store the updated script
+    temp_script="/tmp/updated_script.sh"
+    
+    # Download the latest version of the script
+    curl -s -o "$temp_script" "$script_url"
+    
+    # Compare the local script with the updated script
+    if ! cmp -s "$0" "$temp_script"; then
+        echo "Update found. Applying update..."
+        cp "$temp_script" "$0"
+        chmod +x "$0"
+        echo "Script updated. Please re-run the script."
+        sleep 5
+        exit 0
+    else
+        echo "No updates available."
+        sleep 2
+        show_main
+    fi
 }
 
 show_main
