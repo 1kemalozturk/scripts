@@ -371,6 +371,7 @@ homeassistant_install() {
     wget -O homeassistant-supervised.deb https://github.com/home-assistant/supervised-installer/releases/latest/download/homeassistant-supervised.deb
     apt install -y ./os-agent_linux_x86_64.deb
     apt install -y ./homeassistant-supervised.deb
+    wget -O - https://get.hacs.xyz | bash -
 
     echo "Home Assistant installed."
     sleep 10
@@ -470,7 +471,7 @@ check_for_updates() {
     # Check if the temp file was created successfully
     if [[ ! -f "$temp_script" ]]; then
         echo "Failed to download the update."
-        sleep 10
+        sleep 5
         show_main
         return
     fi
@@ -493,7 +494,7 @@ check_for_updates() {
 
     # Clean up
     rm -f "$temp_script"
-    sleep 10
+    sleep 5
     show_main
 }
 
