@@ -10,7 +10,7 @@ usbip_attach_service_start() {
     else
         echo "Failed to start USBIP service."
     fi
-    sleep 2
+    sleep 10
     show_main
 }
 
@@ -24,7 +24,7 @@ usbip_attach_service_stop() {
     else
         echo "Failed to stop USBIP service."
     fi
-    sleep 2
+    sleep 10
     show_main
 }
 
@@ -51,7 +51,7 @@ usbip_attach_service_auto() {
     # Check if the inputs are not empty
     if [[ -z "$host_ip" || -z "$bus_id" ]]; then
         echo "Host/Server IP or BUSID cannot be empty."
-        sleep 2
+        sleep 10
         show_main
         return
     fi
@@ -75,7 +75,7 @@ WantedBy=multi-user.target" | tee $service_file > /dev/null
     # Check if the service file was created successfully
     if [[ $? -ne 0 ]]; then
         echo "Failed to create service file."
-        sleep 2
+        sleep 10
         show_main
         return
     fi
@@ -92,7 +92,7 @@ usbip attach -r \"$host_ip\" -b \"$bus_id\"" | tee $script_file > /dev/null
     # Check if the script file was created successfully
     if [[ $? -ne 0 ]]; then
         echo "Failed to create attach script."
-        sleep 2
+        sleep 10
         show_main
         return
     fi
@@ -463,24 +463,20 @@ check_for_updates() {
     
     # Temp file to store the updated script
     temp_script="/tmp/updated_script.sh"
-
+    
     # Fetch the latest version of the script
     curl -s -o "$temp_script" "$script_url"
     
     # Check if the temp file was created successfully
     if [[ ! -f "$temp_script" ]]; then
         echo "Failed to download the update."
-        sleep 2
+        sleep 10
         show_main
         return
     fi
-
-    # Compute the hash of the local and updated scripts
-    local_hash=$(sha256sum "$0" | awk '{print $1}')
-    updated_hash=$(sha256sum "$temp_script" | awk '{print $1}')
-
-    # Compare the hashes
-    if [[ "$local_hash" != "$updated_hash" ]]; then
+    
+    # Compare the content of the local and updated scripts
+    if ! cmp -s "$0" "$temp_script"; then
         echo "Update found. Applying update..."
         cp "$temp_script" "$0"
         chmod +x "$0"
@@ -493,7 +489,7 @@ check_for_updates() {
 
     # Clean up
     rm -f "$temp_script"
-    sleep 2
+    sleep 10
     show_main
 }
 
