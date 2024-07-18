@@ -180,8 +180,8 @@ adguardhome_install() {
 
 adguardhome_reinstall() {
     clear
-    echo "Installing AdguardHome loading..."
-    curl -s -S -L https://raw.githubusercontent.com/AdguardTeam/AdGuardHome/master/scripts/install.sh | sh -s -r -v
+    echo "Reinstalling AdguardHome loading..."
+    /opt/AdGuardHome/AdGuardHome -s -r
     echo "AdguardHome installed."
     sleep 2
     show_main
@@ -190,7 +190,7 @@ adguardhome_reinstall() {
 adguardhome_uninstall() {
     clear
     echo "Uninstalling AdguardHome..."
-    /opt/AdGuardHome/AdGuardHome -s -u
+    /opt/AdGuardHome/AdGuardHome -s uninstall
     echo "AdguardHome uninstalled."
     sleep 2
     show_main
