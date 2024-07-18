@@ -61,13 +61,15 @@ adguardhome() {
     clear
     echo "AdguardHome"
     echo "1. Install"
-    echo "2. Uninstall"
+    echo "2. Reinstall"
+    echo "3. Uninstall"
     echo "0. Back"
     echo -n "Choose an option: "
     read choice
     case $choice in
         1) adguardhome_install ;;
-        2) adguardhome_uninstall ;;
+        2) adguardhome_reinstall ;;
+        3) adguardhome_uninstall ;;
         0) show_main ;;
         *) echo "Invalid option!"; sleep 1; adguardhome ;;
     esac
@@ -176,10 +178,19 @@ adguardhome_install() {
     show_main
 }
 
+adguardhome_reinstall() {
+    clear
+    echo "Installing AdguardHome loading..."
+    curl -s -S -L https://raw.githubusercontent.com/AdguardTeam/AdGuardHome/master/scripts/install.sh | sh -s -r -v
+    echo "AdguardHome installed."
+    sleep 2
+    show_main
+}
+
 adguardhome_uninstall() {
     clear
     echo "Uninstalling AdguardHome..."
-    /opt/AdGuardHome/AdGuardHome -s uninstall
+    /opt/AdGuardHome/AdGuardHome -s -u
     echo "AdguardHome uninstalled."
     sleep 2
     show_main
