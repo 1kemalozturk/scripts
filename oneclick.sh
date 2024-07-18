@@ -4,7 +4,7 @@
 usbip_attach_service_start() {
     clear
     echo "Starting USBIP service..."
-    sudo systemctl start usbip-attach.service
+    systemctl start usbip-attach.service
     if [[ $? -eq 0 ]]; then
         echo "USBIP service started successfully."
     else
@@ -18,7 +18,7 @@ usbip_attach_service_start() {
 usbip_attach_service_stop() {
     clear
     echo "Stopping USBIP service..."
-    sudo systemctl stop usbip-attach.service
+    systemctl stop usbip-attach.service
     if [[ $? -eq 0 ]]; then
         echo "USBIP service stopped successfully."
     else
@@ -32,7 +32,7 @@ usbip_attach_service_stop() {
 usbip_attach_service_status() {
     clear
     echo "Checking status of USBIP service..."
-    sudo systemctl status usbip-attach.service
+    systemctl status usbip-attach.service
     sleep 10
     show_main
 }
@@ -70,7 +70,7 @@ ExecStart=$script_file
 Restart=on-failure
 
 [Install]
-WantedBy=multi-user.target" | sudo tee $service_file > /dev/null
+WantedBy=multi-user.target" | tee $service_file > /dev/null
 
     # Check if the service file was created successfully
     if [[ $? -ne 0 ]]; then
@@ -87,7 +87,7 @@ WantedBy=multi-user.target" | sudo tee $service_file > /dev/null
 modprobe vhci-hcd
 
 # Attach USB device
-usbip attach -r \"$host_ip\" -b \"$bus_id\"" | sudo tee $script_file > /dev/null
+usbip attach -r \"$host_ip\" -b \"$bus_id\"" | tee $script_file > /dev/null
 
     # Check if the script file was created successfully
     if [[ $? -ne 0 ]]; then
@@ -98,12 +98,12 @@ usbip attach -r \"$host_ip\" -b \"$bus_id\"" | sudo tee $script_file > /dev/null
     fi
 
     # Make the script executable
-    sudo chmod +x $script_file
+    chmod +x $script_file
 
     # Reload systemd, enable, and start the service
-    sudo systemctl daemon-reload
-    sudo systemctl enable usbip-attach.service
-    sudo systemctl start usbip-attach.service
+    systemctl daemon-reload
+    systemctl enable usbip-attach.service
+    systemctl start usbip-attach.service
 
     # Check if the service was started successfully
     if [[ $? -eq 0 ]]; then
