@@ -457,18 +457,30 @@ systeminfo_checkPort() {
 check_for_updates() {
     clear
     echo "Checking for updates..."
-    
+
     # URL of the raw script from the GitHub repository
     script_url="https://raw.githubusercontent.com/1kemalozturk/scripts/main/oneclick.sh"
     
     # Temp file to store the updated script
     temp_script="/tmp/updated_script.sh"
-    
-    # Download the latest version of the script
+
+    # Fetch the latest version of the script
     curl -s -o "$temp_script" "$script_url"
     
-    # Compare the local script with the updated script
-    if ! cmp -s "$0" "$temp_script"; then
+    # Check if the temp file was created successfully
+    if [[ ! -f "$temp_script" ]]; then
+        echo "Failed to download the update."
+        sleep 2
+        show_main
+        return
+    fi
+
+    # Compute the hash of the local and updated scripts
+    local_hash=$(sha256sum "$0" | awk '{print $1}')
+    updated_hash=$(sha256sum "$temp_script" | awk '{print $1}')
+
+    # Compare the hashes
+    if [[ "$local_hash" != "$updated_hash" ]]; then
         echo "Update found. Applying update..."
         cp "$temp_script" "$0"
         chmod +x "$0"
@@ -477,9 +489,12 @@ check_for_updates() {
         exit 0
     else
         echo "No updates available."
-        sleep 2
-        show_main
     fi
+
+    # Clean up
+    rm -f "$temp_script"
+    sleep 2
+    show_main
 }
 
 show_main
