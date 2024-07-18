@@ -4,9 +4,9 @@ show_main() {
     clear
     echo "1. USBIP WSL/HYPERV"
     echo "2. 3x-UI"
-    echo "2. AdguardHome"
-    echo "3. Home Assistant"
-    echo "4. Troubleshooting"
+    echo "3. AdguardHome"
+    echo "4. Home Assistant"
+    echo "5. Troubleshooting"
     echo "0. Exit Script"
     echo -n "Choose an option: "
     read choice
