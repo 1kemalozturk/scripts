@@ -227,6 +227,7 @@ EOF
 homeassistant_uninstall() {
     clear
     echo "Uninstalling Home Assistant..."
+    apt-get remove --purge docker-ce docker-ce-cli containerd.io
     apt remove \
     apparmor \
     cifs-utils \
@@ -240,7 +241,8 @@ homeassistant_uninstall() {
     systemd-resolved \
     udisks2 \
     os-agent -y
-    rm -fr /var/local/os-agent_linux_x86_64.deb /var/local/homeassistant-supervised.deb
+    rm -fr /var/local/os-agent_linux_x86_64.deb /var/local/homeassistant-supervised.deb /var/lib/docker /var/lib/containerd
+    apt-get autoremove
     echo "Home Assistant uninstalled."
     sleep 10
     show_main
