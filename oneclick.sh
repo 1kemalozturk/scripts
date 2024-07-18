@@ -361,7 +361,8 @@ homeassistant_install() {
         systemd-journal-remote \
         systemd-resolved \
         udisks2 \
-        wget
+        wget \
+        unzip
 
     # Install Docker
     curl -fsSL get.docker.com | sh
