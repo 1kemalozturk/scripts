@@ -187,28 +187,39 @@ adguardhome_uninstall() {
 homeassistant_install() {
     clear
     echo "Installing Home Assistant..."
-    echo "Home Assistant installed."
-    su -
+
+    # `sudo su -` ile kök kullanıcısı olarak oturum açar ve komutları çalıştırır
+    sudo su - <<'EOF'
     cd /var/local
-    apt install \
-    apparmor \
-    cifs-utils \
-    curl \
-    dbus \
-    jq \
-    libglib2.0-bin \
-    lsb-release \
-    network-manager \
-    nfs-common \
-    systemd-journal-remote \
-    systemd-resolved \
-    udisks2 \
-    wget -y
+
+    # Paketleri yükle
+    apt update
+    apt install -y \
+        apparmor \
+        cifs-utils \
+        curl \
+        dbus \
+        jq \
+        libglib2.0-bin \
+        lsb-release \
+        network-manager \
+        nfs-common \
+        systemd-journal-remote \
+        systemd-resolved \
+        udisks2 \
+        wget
+
+    # Docker'ı yükle
     curl -fsSL get.docker.com | sh
+
+    # Home Assistant paketlerini indir ve yükle
     wget -O os-agent_linux_x86_64.deb https://github.com/home-assistant/os-agent/releases/latest/download/os-agent_1.6.0_linux_x86_64.deb
     wget -O homeassistant-supervised.deb https://github.com/home-assistant/supervised-installer/releases/latest/download/homeassistant-supervised.deb
-    apt install ./os-agent_linux_x86_64.deb
-    apt install ./homeassistant-supervised.deb
+    apt install -y ./os-agent_linux_x86_64.deb
+    apt install -y ./homeassistant-supervised.deb
+EOF
+
+    echo "Home Assistant installed."
     sleep 10
     show_main
 }
