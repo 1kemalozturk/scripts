@@ -1,46 +1,46 @@
 #!/bin/bash
 
-# Function to start the USBIP service
+# Function to start the USBIP-Attach service
 usbip_attach_service_start() {
     clear
-    echo "Starting USBIP service..."
+    echo "Starting USBIP-Attach service..."
     systemctl start usbip-attach.service
     if [[ $? -eq 0 ]]; then
-        echo "USBIP service started successfully."
+        echo "USBIP-Attach service started successfully."
     else
-        echo "Failed to start USBIP service."
+        echo "Failed to start USBIP-Attach service."
     fi
     sleep 10
     show_main
 }
 
-# Function to stop the USBIP service
+# Function to stop the USBIP-Attach service
 usbip_attach_service_stop() {
     clear
-    echo "Stopping USBIP service..."
+    echo "Stopping USBIP-Attach service..."
     systemctl stop usbip-attach.service
     if [[ $? -eq 0 ]]; then
-        echo "USBIP service stopped successfully."
+        echo "USBIP-Attach service stopped successfully."
     else
-        echo "Failed to stop USBIP service."
+        echo "Failed to stop USBIP-Attach service."
     fi
     sleep 10
     show_main
 }
 
-# Function to check the status of the USBIP service
+# Function to check the status of the USBIP-Attach service
 usbip_attach_service_status() {
     clear
-    echo "Checking status of USBIP service..."
+    echo "Checking status of USBIP-Attach service..."
     systemctl status usbip-attach.service
     sleep 10
     show_main
 }
 
-# Function to create and configure the USBIP service
+# Function to create and configure the USBIP-Attach service
 usbip_attach_service_auto() {
     clear
-    echo "Setting up USBIP service..."
+    echo "Setting up USBIP-Attach service..."
 
     # Prompt for IP and BUSID
     echo -n "Host/Server IP: "
@@ -107,9 +107,9 @@ usbip attach -r \"$host_ip\" -b \"$bus_id\"" | tee $script_file > /dev/null
 
     # Check if the service was started successfully
     if [[ $? -eq 0 ]]; then
-        echo "USBIP service setup completed successfully."
+        echo "USBIP-Attach service setup completed successfully."
     else
-        echo "Failed to start USBIP service."
+        echo "Failed to start USBIP-Attach service."
     fi
 
     sleep 5
