@@ -38,7 +38,7 @@ usbip_attach_service_status() {
 }
 
 # Function to create and configure the USBIP service
-usbip_attach_service() {
+usbip_attach_service_auto() {
     clear
     echo "Setting up USBIP service..."
 
@@ -165,7 +165,7 @@ usbip_managment() {
     clear
     echo "USBIP WSL/HYPERV MANAGMENT"
     echo "1. Attach"
-    echo "2. Attach Service Auto Start"
+    echo "2. Attach Service Auto"
     echo "3. Attach Service Start"
     echo "4. Attach Service Stop"
     echo "5. Attach Service Status"
@@ -174,10 +174,10 @@ usbip_managment() {
     read choice
     case $choice in
         1) usbip_attach ;;
-        2) usbip_attach_service ;;
+        2) usbip_attach_service_auto ;;
         3) usbip_attach_service_start ;;
         4) usbip_attach_service_stop ;;
-        5) usbip_attach_service_stop ;;
+        5) usbip_attach_service_status ;;
         0) show_main ;;
         *) echo "Invalid option!"; sleep 1; 3xui ;;
     esac
