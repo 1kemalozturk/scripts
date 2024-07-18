@@ -92,12 +92,12 @@ homeassistant() {
 troubleshooting() {
     clear
     echo "Troubleshooting"
-    echo "1. DPKG"
+    echo "1. DPKG Repair"
     echo "0. Back"
     echo -n "Choose an option: "
     read choice
     case $choice in
-        1) troubleshooting_dpkg_fix ;;
+        1) troubleshooting_dpkg_repair ;;
         0) show_main ;;
         *) echo "Invalid option!"; sleep 1; troubleshooting ;;
     esac
@@ -120,7 +120,6 @@ usbip_debian_install() {
     echo "Installing USBIP on Debian..."
     apt update
     apt install -y hwdata usbutils usbip
-    modprobe vhci-hcd
     echo "USBIP installed on Debian."
     sleep 10
     show_main
@@ -138,9 +137,10 @@ usbip_uninstall() {
 
 usbip_attach() {
     clear
-    echo -n "Enter HOST IP: "
+    modprobe vhci-hcd
+    echo -n "Host/Server IP: "
     read host_ip
-    echo -n "Enter BUS ID: "
+    echo -n "Host/Server BUSID: "
     read bus_id
     usbip attach -r "$host_ip" -b "$bus_id"
     lsusb
@@ -243,7 +243,7 @@ homeassistant_uninstall() {
     show_main
 }
 
-troubleshooting_dpkg_fix() {
+troubleshooting_dpkg_repair() {
     clear
     dpkg --force-all --configure -a
     apt --fix-broken install
