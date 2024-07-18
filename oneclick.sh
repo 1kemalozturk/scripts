@@ -463,7 +463,7 @@ check_for_updates() {
     
     # Temp file to store the updated script
     temp_script="/tmp/updated_script.sh"
-    
+
     # Fetch the latest version of the script
     curl -s -o "$temp_script" "$script_url"
     
@@ -474,9 +474,13 @@ check_for_updates() {
         show_main
         return
     fi
-    
-    # Compare the content of the local and updated scripts
-    if ! cmp -s "$0" "$temp_script"; then
+
+    # Compute the hash of the local and updated scripts
+    local_hash=$(sha256sum "$0" | awk '{print $1}')
+    updated_hash=$(sha256sum "$temp_script" | awk '{print $1}')
+
+    # Compare the hashes
+    if [[ "$local_hash" != "$updated_hash" ]]; then
         echo "Update found. Applying update..."
         cp "$temp_script" "$0"
         chmod +x "$0"
