@@ -45,13 +45,13 @@ usbip() {
     clear
     echo "3x-UI"
     echo "1. Install"
-    echo "2. Uninstall"
+    echo "2. Management"
     echo "0. Back"
     echo -n "Choose an option: "
     read choice
     case $choice in
         1) 3xui_install ;;
-        2) 3xui_uninstall ;;
+        2) 3xui_management ;;
         0) show_main ;;
         *) echo "Invalid option!"; sleep 1; 3xui ;;
     esac
@@ -158,11 +158,9 @@ usbip_attach() {
     show_main
 }
 
-3xui_uninstall() {
+3xui_management() {
     clear
-    echo "Uninstalling 3x-UI..."
-    
-    echo "3x-UI uninstalled."
+    x-ui
     sleep 10
     show_main
 }
