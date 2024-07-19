@@ -19,7 +19,7 @@ DISK_USED=$(df -h / | grep / | awk '{ print $3 }')
 MEMORY_USAGE=$(free -m | awk 'NR==2{printf "%.0f%%", $3*100/$2}')
 
 # Swap usage
-SWAP_USAGE=$(free -m | awk 'NR==3{printf "%.0f%%", $3*100/$2 }')
+SWAP_USAGE=$(free -m | awk '/Swap/{printf "%.0f%%", $3*100/$2}')
 
 # Number of running processes
 PROCESSES=$(ps aux --no-heading | wc -l)
@@ -572,7 +572,7 @@ homeassistant_hacs_install() {
     echo "Installing Home Assistant Hacs..."
     apt-get -y install unzip
     wget -O - https://get.hacs.xyz | bash -
-    echo "Home Assistant Hacs installed."
+
     sleep 10
     homeassistant
 }
@@ -613,14 +613,31 @@ ollama() {
 
 ollama_install() {
     clear
-
+    echo "Installing Ollama..."
+    curl -fsSL https://ollama.com/install.sh | sh
+    echo "Ollama installed."
     sleep 10
     ollama
 }
 
 ollama_uninstall() {
     clear
+    echo "Uninstalling Ollama..."
+    systemctl stop ollama
+    systemctl disable ollama
+    rm /etc/systemd/system/ollama.service
 
+    cd /usr/local/bin
+    rm $(which ollama)
+    cd /usr/bin
+    rm $(which ollama)
+    cd /bin
+    rm $(which ollama)
+
+    rm -r /usr/share/ollama
+    userdel ollama
+    groupdel ollama
+    echo "Ollama Uninstalled."
     sleep 10
     ollama
 }
