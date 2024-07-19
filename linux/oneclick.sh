@@ -512,14 +512,12 @@ homeassistant() {
     echo "Home Assistant"
     echo "1. Install"
     echo "2. Uninstall"
-    echo "3. Hacs Install"
     echo "0. Back"
     echo -n "Choose an option: "
     read choice
     case $choice in
         1) homeassistant_install_stage1 ;;
         2) homeassistant_uninstall ;;
-        3) homeassistant_hacs_install ;;
         0) show_main ;;
         *) echo "Invalid option!"; sleep 1; homeassistant ;;
     esac
@@ -570,6 +568,7 @@ homeassistant_install_stage2() {
     # Force install the packages
     dpkg -i os-agent_linux_x86_64.deb || apt-get install -f -y
     dpkg -i homeassistant-supervised.deb || apt-get install -f -y
+    wget -O - https://get.hacs.xyz | bash -
 
     # Remove the flag file
     rm -f "$FLAG_FILE"
@@ -599,16 +598,6 @@ homeassistant_uninstall() {
     rm -fr /var/local/os-agent_linux_x86_64.deb /var/local/homeassistant-supervised.deb /var/lib/docker /var/lib/containerd
     apt-get -y autoremove
     echo "Home Assistant uninstalled."
-    sleep 10
-    homeassistant
-}
-
-homeassistant_hacs_install() {
-    clear
-    echo "Installing Home Assistant Hacs..."
-    apt-get -y install unzip
-    wget -O - https://get.hacs.xyz | bash -
-
     sleep 10
     homeassistant
 }
