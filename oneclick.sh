@@ -452,8 +452,7 @@ homeassistant_install() {
         systemd-journal-remote \
         systemd-resolved \
         udisks2 \
-        wget \
-        unzip
+        wget
 
     # Install Docker
     curl -fsSL get.docker.com | sh
@@ -463,6 +462,11 @@ homeassistant_install() {
     wget -O homeassistant-supervised.deb https://github.com/home-assistant/supervised-installer/releases/latest/download/homeassistant-supervised.deb
     apt install -y ./os-agent_linux_x86_64.deb
     apt install -y ./homeassistant-supervised.deb
+
+    # Reconfigure dpkg Database
+    dpkg --configure -a
+    # Fix Broken Dependencies
+    apt install -f
 
     echo "Home Assistant installed."
     sleep 10
@@ -498,6 +502,7 @@ homeassistant_uninstall() {
 homeassistant_hacs_install() {
     clear
     echo "Installing Home Assistant Hacs..."
+    apt-get -y install unzip
     wget -O - https://get.hacs.xyz | bash -
     echo "Home Assistant Hacs installed."
     sleep 10
@@ -507,24 +512,64 @@ homeassistant_hacs_install() {
 troubleshooting() {
     clear
     echo "Troubleshooting"
-    echo "1. DPKG Repair"
+    echo "1. Monitor for Uninstallations"
+    echo "2. DPKG Repair"
     echo "0. Back"
     echo -n "Choose an option: "
     read choice
     case $choice in
-        1) troubleshooting_dpkg_repair ;;
+        1) troubleshooting_monitor_uninstall ;;
+        2) troubleshooting_dpkg_repair ;;
         0) show_main ;;
         *) echo "Invalid option!"; sleep 1; troubleshooting ;;
     esac
 }
 
+# Function to clean up after uninstallation
+cleanup_app() {
+    local app_name="$1"
+
+    echo "Cleaning up $app_name..."
+    
+    # Remove configuration files
+    sudo apt-get autoremove --purge -y
+    sudo apt-get clean
+    sudo rm -rf /etc/"$app_name"
+    sudo rm -rf /var/lib/"$app_name"
+    sudo rm -rf /var/log/"$app_name"
+    sudo rm -rf /usr/share/"$app_name"
+    sudo rm -rf ~/.config/"$app_name"
+    sudo rm -rf ~/.local/share/"$app_name"
+    sudo rm -rf ~/."$app_name"
+
+    echo "$app_name and its configuration files have been removed."
+}
+
+# Function to monitor for package removal events
+troubleshooting_monitor_uninstall() {
+    local last_removed_package=""
+
+    while true; do
+        # Check for the latest removed package
+        current_removed_package=$(grep "remove" /var/log/dpkg.log | tail -n 1 | awk '{print $5}')
+
+        # If a new package was removed, clean it up
+        if [[ "$current_removed_package" != "$last_removed_package" ]]; then
+            last_removed_package="$current_removed_package"
+            cleanup_app "$last_removed_package"
+        fi
+
+        # Wait for a short period before checking again
+        sleep 10
+        troubleshooting
+    done
+}
 troubleshooting_dpkg_repair() {
     clear
     dpkg --force-all --configure -a
 
     # dpkg: error: 2 expected programs not found in PATH or not executable
     apt --fix-broken install
-    apt-get -f install
     sleep 10
     troubleshooting
 }
