@@ -8,57 +8,44 @@
 $scriptUrl = "https://raw.githubusercontent.com/1kemalozturk/scripts/main/windows/oneclick.ps1"
 $tempScriptPath = "$env:TEMP\updated_script.ps1"
 
-function Check-ForUpdates {
+function Check-For-Updates {
+    Clear-Host
+    Write-Host "Checking for updates..."
+
+    # GitHub repository bilgileri
+    $scriptUrl = "https://raw.githubusercontent.com/1kemalozturk/scripts/main/windows/oneclick.ps1"
+    
+    # Temp dosyası için yol
+    $tempScript = "$env:TEMP\updated_script.ps1"
+    
+    # Güncel scripti indir
     try {
-        Write-Output "Checking for updates..."
-
-        # Download the latest version of the script
-        Write-Output "Downloading the script from $scriptUrl to $tempScriptPath..."
-        Invoke-RestMethod -Uri $scriptUrl -OutFile $tempScriptPath
-        
-        # Check if the temp file was created successfully
-        if (-Not (Test-Path $tempScriptPath)) {
-            throw "Failed to download the update or the temp file does not exist."
-        }
-
-        # Compute the hash of the local and updated scripts
-        $localPath = $MyInvocation.MyCommand.Path
-
-        # Fallback to manually specifying the script path if $localPath is null or empty
-        if (-not $localPath) {
-            $localPath = "C:\Path\To\Your\Script.ps1"  # Replace this with the actual path to your script
-            Write-Output "Using fallback local script path: $localPath"
-        } else {
-            Write-Output "Local script path: $localPath"
-        }
-
-        if (-Not (Test-Path $localPath)) {
-            throw "Local script file does not exist."
-        }
-        
-        $localHash = Get-FileHash -Path $localPath -Algorithm SHA256 | Select-Object -ExpandProperty Hash
-        $updatedHash = Get-FileHash -Path $tempScriptPath -Algorithm SHA256 | Select-Object -ExpandProperty Hash
-
-        Write-Output "Local script hash: $localHash"
-        Write-Output "Updated script hash: $updatedHash"
-
-        # Compare the hashes
-        if ($localHash -ne $updatedHash) {
-            Write-Output "Update found. Applying update..."
-            Copy-Item -Path $tempScriptPath -Destination $localPath -Force
-            Write-Output "Script updated. Please re-run the script."
-            exit
-        } else {
-            Write-Output "No updates available."
-        }
+        Invoke-WebRequest -Uri $scriptUrl -OutFile $tempScript -ErrorAction Stop
     } catch {
-        Write-Output "Failed to check for updates: $_.Exception.Message"
-    } finally {
-        # Clean up
-        if (Test-Path $tempScriptPath) {
-            Remove-Item -Path $tempScriptPath -ErrorAction SilentlyContinue
-        }
+        Write-Host "Failed to download the update."
+        Start-Sleep -Seconds 5
+        Show-Main
+        return
     }
+
+    # Yerel ve güncel scriptlerin hash'ini hesapla
+    $localHash = Get-FileHash -Path $MyInvocation.MyCommand.Path -Algorithm SHA256 | Select-Object -ExpandProperty Hash
+    $updatedHash = Get-FileHash -Path $tempScript -Algorithm SHA256 | Select-Object -ExpandProperty Hash
+
+    # Hash'leri karşılaştır
+    if ($localHash -ne $updatedHash) {
+        Write-Host "Update found. Applying update..."
+        Copy-Item -Path $tempScript -Destination $MyInvocation.MyCommand.Path -Force
+        Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
+        Write-Host "Script updated. Please re-run the script."
+        Start-Sleep -Seconds 5
+        exit
+    } else {
+        Write-Host "No updates available."
+    }
+
+    # Temp dosyasını temizle
+    Remove-Item -Path $tempScript -Force
 }
 
 function Install-USBIPD {
