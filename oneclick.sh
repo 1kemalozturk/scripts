@@ -587,7 +587,7 @@ ai() {
     read choice
     case $choice in
         1) ollama ;;
-        2) open_webui
+        2) open_webui ;;
         0) show_main ;;
         *) echo "Invalid option!"; sleep 1; ai ;;
     esac
