@@ -1,34 +1,35 @@
 # Ensure the script uses UTF-8 encoding
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 
-# Define the script version and GitHub update check details
-$scriptVersion = "1.0"
-$repositoryOwner = "1kemalozturk"
-$repositoryName = "scripts"
-$versionFilePath = "usbipd-win.txt"  # Path to the file in the GitHub repo that contains the latest version
-$scriptFileName = "usbipd-win.ps1"  # Script file name in the GitHub repo
+# Define the script URL on GitHub
+$scriptUrl = "https://raw.githubusercontent.com/your-username/your-repository/main/usbipd_script.ps1"
+$tempScriptPath = "$env:TEMP\updated_script.ps1"
 
 function Check-ForUpdates {
     try {
-        $versionUrl = "https://raw.githubusercontent.com/$repositoryOwner/$repositoryName/main/$versionFilePath"
-        $latestVersion = Invoke-RestMethod -Uri $versionUrl
+        Write-Output "Checking for updates..."
 
-        if ($latestVersion -ne $scriptVersion) {
-            Write-Output "A new version of the script is available. Updating..."
-            
-            $scriptUrl = "https://raw.githubusercontent.com/$repositoryOwner/$repositoryName/main/$scriptFileName"
-            $updatedScript = Invoke-RestMethod -Uri $scriptUrl
-            
-            $localScriptPath = $MyInvocation.MyCommand.Path
-            Set-Content -Path $localScriptPath -Value $updatedScript -Encoding UTF8
-            
-            Write-Output "Script updated successfully. Please run the script again."
+        # Download the latest version of the script
+        Invoke-RestMethod -Uri $scriptUrl -OutFile $tempScriptPath
+
+        # Compute the hash of the local and updated scripts
+        $localHash = Get-FileHash -Path $MyInvocation.MyCommand.Path -Algorithm SHA256 | Select-Object -ExpandProperty Hash
+        $updatedHash = Get-FileHash -Path $tempScriptPath -Algorithm SHA256 | Select-Object -ExpandProperty Hash
+
+        # Compare the hashes
+        if ($localHash -ne $updatedHash) {
+            Write-Output "Update found. Applying update..."
+            Copy-Item -Path $tempScriptPath -Destination $MyInvocation.MyCommand.Path -Force
+            Write-Output "Script updated. Please re-run the script."
             exit
         } else {
-            Write-Output "You are using the latest version of the script."
+            Write-Output "No updates available."
         }
     } catch {
         Write-Output "Failed to check for updates. Proceeding with the current version."
+    } finally {
+        # Clean up
+        Remove-Item -Path $tempScriptPath -ErrorAction SilentlyContinue
     }
 }
 
