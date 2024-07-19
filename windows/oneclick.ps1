@@ -1,11 +1,14 @@
 # Ensure the script uses UTF-8 encoding
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 
+# Ensure the script uses UTF-8 encoding
+[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
+
 # Define the script URL on GitHub
 $scriptUrl = "https://raw.githubusercontent.com/1kemalozturk/scripts/main/windows/oneclick.ps1"
 $tempScriptPath = "$env:TEMP\updated_script.ps1"
 
-function Check-For-Updates {
+function Check-ForUpdates {
     try {
         Write-Output "Checking for updates..."
 
@@ -20,7 +23,15 @@ function Check-For-Updates {
 
         # Compute the hash of the local and updated scripts
         $localPath = $MyInvocation.MyCommand.Path
-        Write-Output "Local script path: $localPath"
+
+        # Fallback to manually specifying the script path if $localPath is null or empty
+        if (-not $localPath) {
+            $localPath = "C:\Path\To\Your\Script.ps1"  # Replace this with the actual path to your script
+            Write-Output "Using fallback local script path: $localPath"
+        } else {
+            Write-Output "Local script path: $localPath"
+        }
+
         if (-Not (Test-Path $localPath)) {
             throw "Local script file does not exist."
         }
