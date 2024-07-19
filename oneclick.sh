@@ -465,8 +465,6 @@ homeassistant_install() {
 
     # Reconfigure dpkg Database
     dpkg --configure -a
-    # Fix Broken Dependencies
-    apt install -f
 
     echo "Home Assistant installed."
     sleep 10
