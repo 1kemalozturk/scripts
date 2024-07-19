@@ -146,9 +146,9 @@ networking() {
     echo -n "Choose an option: "
     read choice
     case $choice in
-        1) 3xui ;;
+        1) 3x-ui ;;
         2) adguardhome ;;
-        3) pihole ;;
+        3) pi-hole ;;
         0) show_main ;;
         *) echo "Invalid option!"; sleep 1; networking ;;
     esac
@@ -403,7 +403,7 @@ usbip_attach_service_status() {
     usbip_managment
 }
 
-3xui() {
+3x-ui() {
     clear
     echo "3x-UI"
     echo "1. Install"
@@ -412,27 +412,27 @@ usbip_attach_service_status() {
     echo -n "Choose an option: "
     read choice
     case $choice in
-        1) 3xui_install ;;
-        2) 3xui_management ;;
+        1) 3x-ui_install ;;
+        2) 3x-ui_management ;;
         0) show_main ;;
-        *) echo "Invalid option!"; sleep 1; 3xui ;;
+        *) echo "Invalid option!"; sleep 1; 3x-ui ;;
     esac
 }
 
-3xui_install() {
+3x-ui_install() {
     clear
     echo "Installing 3x-UI..."
     bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh)
     echo "3x-UI installed."
     sleep 10
-    3xui
+    3x-ui
 }
 
-3xui_management() {
+3x-ui_management() {
     clear
     x-ui
     sleep 10
-    3xui
+    3x-ui
 }
 
 adguardhome() {
@@ -473,7 +473,7 @@ adguardhome_uninstall() {
     adguardhome
 }
 
-pihole() {
+pi-hole() {
     clear
     echo "Pi-hole"
     echo "1. Install"
@@ -482,14 +482,14 @@ pihole() {
     echo -n "Choose an option: "
     read choice
     case $choice in
-        1) pihole_install ;;
-        2) pihole_uninstall ;;
+        1) pi-hole_install ;;
+        2) pi-hole_uninstall ;;
         0) show_main ;;
-        *) echo "Invalid option!"; sleep 1; pihole ;;
+        *) echo "Invalid option!"; sleep 1; pi-hole ;;
     esac
 }
 
-pihole_install() {
+pi-hole_install() {
     clear
     echo "Installing Pi-hole..."
     curl -sSL https://install.pi-hole.net | bash
@@ -498,10 +498,10 @@ pihole_install() {
     pihole
 }
 
-pihole_uninstall() {
+pi-hole_uninstall() {
     clear
     echo "Uninstalling Pi-hole..."
-    pihole uninstall --unattended
+    pihole uninstall
     echo "Pi-hole uninstalled."
     sleep 10
     pihole
