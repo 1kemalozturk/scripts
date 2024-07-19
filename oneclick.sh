@@ -1,7 +1,54 @@
 #!/bin/bash
 
+# OS and Kernel information
+OS_INFO=$(lsb_release -d | awk -F"\t" '{print $2}')
+KERNEL_INFO=$(uname -r)
+
+# System time
+DATE=$(date)
+
+# System load
+SYSTEM_LOAD=$(uptime | awk -F 'load average:' '{ print $2 }' | cut -d, -f1)
+
+# Disk usage
+DISK_USAGE=$(df -h / | grep / | awk '{ print $5 }')
+DISK_TOTAL=$(df -h / | grep / | awk '{ print $2 }')
+DISK_USED=$(df -h / | grep / | awk '{ print $3 }')
+
+# Memory usage
+MEMORY_USAGE=$(free -m | awk 'NR==2{printf "%.0f%%", $3*100/$2 }')
+
+# Swap usage
+SWAP_USAGE=$(free -m | awk 'NR==3{printf "%.0f%%", $3*100/$2 }')
+
+# Number of running processes
+PROCESSES=$(ps aux --no-heading | wc -l)
+
+# Number of logged in users
+USERS=$(who | wc -l)
+
+# Network information
+IPV4_ADDRESS=$(ip -4 addr show eth0 | grep -oP '(?<=inet\s)\d+(\.\d+){3}')
+
+
 show_main() {
     clear
+    echo "Welcome to $OS_INFO (GNU/Linux $KERNEL_INFO)"
+    echo ""
+    echo " * Documentation:  https://github.com/1kemalozturk/scripts"
+    echo " * Support:        https://github.com/1kemalozturk/scripts/issues"
+    echo ""
+    echo "System information as of $DATE"
+    echo ""
+    echo "  System load:    $SYSTEM_LOAD"
+    echo "  Usage of /:     $DISK_USAGE of $DISK_TOTAL ($DISK_USED used)"
+    echo "  Memory usage:   $MEMORY_USAGE"
+    echo "  Swap usage:     $SWAP_USAGE"
+    echo "  Processes:      $PROCESSES"
+    echo "  Users logged in:$USERS"
+    echo "  IPv4 address for eth0: $IPV4_ADDRESS"
+    echo ""
+    echo ""
     echo "1. Developer Tools"
     echo "2. Networking"
     echo "3. Home & Automation"
