@@ -738,44 +738,16 @@ troubleshooting() {
     esac
 }
 
-# Function to clean up after uninstallation
-cleanup_app() {
-    local app_name="$1"
-
-    echo "Cleaning up $app_name..."
-    
-    # Remove configuration files
-    sudo apt-get autoremove --purge -y
-    sudo apt-get clean
-    sudo rm -rf /etc/"$app_name"
-    sudo rm -rf /var/lib/"$app_name"
-    sudo rm -rf /var/log/"$app_name"
-    sudo rm -rf /usr/share/"$app_name"
-    sudo rm -rf ~/.config/"$app_name"
-    sudo rm -rf ~/.local/share/"$app_name"
-    sudo rm -rf ~/."$app_name"
-
-    echo "$app_name and its configuration files have been removed."
-}
-
 # Function to monitor for package removal events
 troubleshooting_monitor_uninstall() {
-    local last_removed_package=""
+    clear
 
-    while true; do
-        # Check for the latest removed package
-        current_removed_package=$(grep "remove" /var/log/dpkg.log | tail -n 1 | awk '{print $5}')
+    # Remove configuration files
+    apt-get autoremove --purge -y
+    apt-get clean
 
-        # If a new package was removed, clean it up
-        if [[ "$current_removed_package" != "$last_removed_package" ]]; then
-            last_removed_package="$current_removed_package"
-            cleanup_app "$last_removed_package"
-        fi
-
-        # Wait for a short period before checking again
-        sleep 10
-        troubleshooting
-    done
+    sleep 10
+    troubleshooting
 }
 troubleshooting_dpkg_repair() {
     clear
