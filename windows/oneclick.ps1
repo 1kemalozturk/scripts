@@ -1,21 +1,17 @@
 ## Ensure the script uses UTF-8 encoding
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 
-# Define the script URL on GitHub
-$scriptUrl = "https://raw.githubusercontent.com/1kemalozturk/scripts/main/windows/oneclick.ps1"
-$tempScriptPath = "$env:TEMP\updated_script.ps1"
-
-function Check-For-Updates {
+function Check-ForUpdates {
     Clear-Host
     Write-Host "Checking for updates..."
 
-    # GitHub repository bilgileri
-    $scriptUrl = "https://raw.githubusercontent.com/1kemalozturk/scripts/main/windows/oneclick.ps1"
+    # GitHub repository's raw script URL
+    $scriptUrl = "https://raw.githubusercontent.com/1kemalozturk/scripts/main/windows/oneclick.sh"
     
-    # Temp dosyası için yol
-    $tempScript = "$env:TEMP\updated_script.ps1"
-    
-    # Güncel scripti indir
+    # Temp file to store the updated script
+    $tempScript = [System.IO.Path]::Combine($env:TEMP, "updated_script.ps1")
+
+    # Fetch the latest version of the script
     try {
         Invoke-WebRequest -Uri $scriptUrl -OutFile $tempScript -ErrorAction Stop
     } catch {
@@ -25,23 +21,30 @@ function Check-For-Updates {
         return
     }
 
-    # Yerel ve güncel scriptlerin hash'ini hesapla
-    $localHash = Get-FileHash -Path $MyInvocation.MyCommand.Path -Algorithm SHA256 | Select-Object -ExpandProperty Hash
+    # Check if the temp file was created successfully
+    if (-Not (Test-Path -Path $tempScript)) {
+        Write-Host "Failed to download the update."
+        Start-Sleep -Seconds 5
+        Show-Main
+        return
+    }
+
+    # Compute the hash of the local and updated scripts
+    $localHash = Get-FileHash -Path $PSCommandPath -Algorithm SHA256 | Select-Object -ExpandProperty Hash
     $updatedHash = Get-FileHash -Path $tempScript -Algorithm SHA256 | Select-Object -ExpandProperty Hash
 
-    # Hash'leri karşılaştır
+    # Compare the hashes
     if ($localHash -ne $updatedHash) {
         Write-Host "Update found. Applying update..."
-        Copy-Item -Path $tempScript -Destination $MyInvocation.MyCommand.Path -Force
-        Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process
+        Copy-Item -Path $tempScript -Destination $PSCommandPath -Force
         Write-Host "Script updated. Please re-run the script."
         Start-Sleep -Seconds 5
-        exit
+        Exit
     } else {
         Write-Host "No updates available."
     }
 
-    # Temp dosyasını temizle
+    # Clean up
     Remove-Item -Path $tempScript -Force
 }
 
