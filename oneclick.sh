@@ -62,6 +62,17 @@ check_for_updates() {
     rm -f "$temp_script"
 }
 
+# Flag file to check the stage of the installation
+FLAG_FILE="/var/local/homeassistant_install_stage"
+
+# Function to check the flag file and continue installation if necessary
+check_for_homeassistant_install() {
+    if [ -f "$FLAG_FILE" ]; then
+        homeassistant_install_stage2
+        exit 0
+    fi
+}
+
 developer_tools() {
     clear
     echo "Developer Tools"
@@ -429,9 +440,6 @@ homeassistant() {
     esac
 }
 
-# Flag file to check the stage of the installation
-FLAG_FILE="/var/local/homeassistant_install_stage"
-
 homeassistant_install_stage1() {
     clear
     echo "Installing Home Assistant..."
@@ -484,14 +492,6 @@ homeassistant_install_stage2() {
     echo "Home Assistant installed."
     sleep 10
     homeassistant
-}
-
-# Function to check the flag file and continue installation if necessary
-homeassistant_install_check() {
-    if [ -f "$FLAG_FILE" ]; then
-        homeassistant_install_stage2
-        exit 0
-    fi
 }
 
 homeassistant_uninstall() {
@@ -639,5 +639,5 @@ systeminfo_checkPort() {
 }
 
 check_for_updates
-homeassistant_install_check
+check_for_homeassistant_install
 show_main
