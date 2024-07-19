@@ -495,7 +495,7 @@ pi-hole_install() {
     curl -sSL https://install.pi-hole.net | bash
     echo "Pi-hole installed."
     sleep 10
-    pihole
+    pi-hole
 }
 
 pi-hole_uninstall() {
@@ -504,7 +504,7 @@ pi-hole_uninstall() {
     pihole uninstall
     echo "Pi-hole uninstalled."
     sleep 10
-    pihole
+    pi-hole
 }
 
 homeassistant() {
@@ -612,7 +612,7 @@ ai() {
     read choice
     case $choice in
         1) ollama ;;
-        2) open_webui ;;
+        2) open-webui ;;
         0) show_main ;;
         *) echo "Invalid option!"; sleep 1; ai ;;
     esac
@@ -667,7 +667,7 @@ ollama_uninstall() {
     ollama
 }
 
-open_webui() {
+open-webui() {
     clear
     echo "Open WebUI"
     echo "1. Install"
@@ -676,27 +676,27 @@ open_webui() {
     echo -n "Choose an option: "
     read choice
     case $choice in
-        1) open_webui_install ;;
-        2) open_webui_uninstall ;;
+        1) open-webui_install ;;
+        2) open-webui_uninstall ;;
         0) show_main ;;
-        *) echo "Invalid option!"; sleep 1; open_webui ;;
+        *) echo "Invalid option!"; sleep 1; open-webui ;;
     esac
     sleep 10
-    open_webui
+    open-webui
 }
 
-open_webui_install() {
+open-webui_install() {
     clear
 
     sleep 10
-    ollama
+    open-webui
 }
 
-open_webui_uninstall() {
+open-webui_uninstall() {
     clear
 
     sleep 10
-    ollama
+    open-webui
 }
 
 tools() {
