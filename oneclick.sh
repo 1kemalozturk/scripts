@@ -182,7 +182,7 @@ usbip_install() {
             ;;
     esac
     sleep 10
-    show_main
+    usbip
 }
 
 usbip_uninstall() {
@@ -219,7 +219,7 @@ usbip_uninstall() {
             ;;
     esac
     sleep 10
-    show_main
+    usbip
 }
 
 # usbip_attach_service() {
@@ -233,7 +233,7 @@ usbip_uninstall() {
 #     lsusb
 #     echo "USB device attached from $host_ip with bus ID $bus_id."
 #     sleep 10
-#     show_main
+#     usbip_managment
 # }
 
 # Function to create and configure the Usbip-Attach service
@@ -312,7 +312,7 @@ usbip attach -r \"$host_ip\" -b \"$bus_id\"" | tee $script_file > /dev/null
     fi
 
     sleep 5
-    show_main
+    usbip_managment
 }
 
 usbip_attach_service_uninstall() {
@@ -333,7 +333,7 @@ usbip_attach_service_uninstall() {
 
     echo "Usbip-Attach service removed successfully."
     sleep 10
-    show_main
+    usbip_managment
 }
 
 # Function to check the status of the USBIP-Attach service
@@ -342,7 +342,7 @@ usbip_attach_service_status() {
     echo "Checking status of Usbip-Attach service..."
     systemctl status usbip-attach.service
     sleep 10
-    show_main
+    usbip_managment
 }
 
 3xui() {
@@ -367,14 +367,14 @@ usbip_attach_service_status() {
     bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh)
     echo "3x-UI installed."
     sleep 10
-    show_main
+    3xui
 }
 
 3xui_management() {
     clear
     x-ui
     sleep 10
-    show_main
+    3xui
 }
 
 adguardhome() {
@@ -399,7 +399,7 @@ adguardhome_install() {
     curl -s -S -L https://raw.githubusercontent.com/AdguardTeam/AdGuardHome/master/scripts/install.sh | sh -s -- -v
     echo "AdguardHome installed."
     sleep 10
-    show_main
+    adguardhome
 }
 
 adguardhome_uninstall() {
@@ -412,7 +412,7 @@ adguardhome_uninstall() {
     systemctl restart systemd-resolved
     echo "AdguardHome uninstalled."
     sleep 10
-    show_main
+    adguardhome
 }
 
 homeassistant() {
@@ -466,8 +466,9 @@ homeassistant_install() {
 
     echo "Home Assistant installed."
     sleep 10
+    echo "System is restarting..."
+    sleep 10
     systemctl reboot
-    show_main
 }
 
 homeassistant_uninstall() {
@@ -491,7 +492,7 @@ homeassistant_uninstall() {
     apt-get -y autoremove
     echo "Home Assistant uninstalled."
     sleep 10
-    show_main
+    homeassistant
 }
 
 homeassistant_hacs_install() {
@@ -500,7 +501,7 @@ homeassistant_hacs_install() {
     wget -O - https://get.hacs.xyz | bash -
     echo "Home Assistant Hacs installed."
     sleep 10
-    show_main
+    homeassistant
 }
 
 troubleshooting() {
@@ -525,7 +526,7 @@ troubleshooting_dpkg_repair() {
     apt --fix-broken install
     apt-get -f install
     sleep 10
-    show_main
+    troubleshooting
 }
 
 systeminfo() {
@@ -560,7 +561,7 @@ systeminfo_lanIP() {
     fi
 
     sleep 10
-    show_main
+    systeminfo
 }
 
 systeminfo_checkPort() {
@@ -570,7 +571,7 @@ systeminfo_checkPort() {
     read checkPort
     ss -lntp | grep "$checkPort"
     sleep 10
-    show_main
+    systeminfo
 }
 
 show_main
