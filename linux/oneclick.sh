@@ -19,7 +19,7 @@ DISK_USED=$(df -h / | grep / | awk '{ print $3 }')
 MEMORY_USAGE=$(free -m | awk 'NR==2{printf "%.0f%%", $3*100/$2}')
 
 # Swap usage
-SWAP_USAGE=$(free -m | awk '/Swap/{printf "%.0f%%", $3*100/$2}')
+SWAP_USAGE=$(free -m | awk '/^Swap/ {printf "%.0f%%", $3*100/$2}')
 
 # Number of running processes
 PROCESSES=$(ps aux --no-heading | wc -l)
@@ -489,7 +489,7 @@ pihole() {
     esac
 }
 
-pihole_install(){
+pihole_install() {
     clear
     echo "Installing Pi-hole..."
     curl -sSL https://install.pi-hole.net | bash
@@ -498,7 +498,7 @@ pihole_install(){
     pihole
 }
 
-pihole_uninstall(){
+pihole_uninstall() {
     clear
     echo "Uninstalling Pi-hole..."
     pihole uninstall
