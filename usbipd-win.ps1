@@ -12,6 +12,11 @@ function Check-ForUpdates {
         # Download the latest version of the script
         Invoke-RestMethod -Uri $scriptUrl -OutFile $tempScriptPath
 
+        # Check if the temp file was created successfully
+        if (-Not (Test-Path $tempScriptPath)) {
+            throw "Failed to download the update."
+        }
+
         # Compute the hash of the local and updated scripts
         $localHash = Get-FileHash -Path $MyInvocation.MyCommand.Path -Algorithm SHA256 | Select-Object -ExpandProperty Hash
         $updatedHash = Get-FileHash -Path $tempScriptPath -Algorithm SHA256 | Select-Object -ExpandProperty Hash
@@ -26,7 +31,7 @@ function Check-ForUpdates {
             Write-Output "No updates available."
         }
     } catch {
-        Write-Output "Failed to check for updates. Proceeding with the current version."
+        Write-Output "Failed to check for updates: $_.Exception.Message"
     } finally {
         # Clean up
         Remove-Item -Path $tempScriptPath -ErrorAction SilentlyContinue
