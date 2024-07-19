@@ -1,7 +1,4 @@
-# Ensure the script uses UTF-8 encoding
-[Console]::OutputEncoding = [System.Text.Encoding]::UTF8
-
-# Ensure the script uses UTF-8 encoding
+## Ensure the script uses UTF-8 encoding
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 
 # Define the script URL on GitHub
