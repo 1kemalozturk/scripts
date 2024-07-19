@@ -501,7 +501,7 @@ pihole_install() {
 pihole_uninstall() {
     clear
     echo "Uninstalling Pi-hole..."
-    pihole uninstall
+    pihole uninstall --unattended
     echo "Pi-hole uninstalled."
     sleep 10
     pihole
