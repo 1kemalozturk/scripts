@@ -1,51 +1,35 @@
-## Ensure the script uses UTF-8 encoding
+# Ensure the script uses UTF-8 encoding
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 
-function Check-ForUpdates {
-    Clear-Host
-    Write-Host "Checking for updates..."
+# Define the script version and GitHub update check details
+$scriptVersion = "24.07.19.2720"
+$repositoryOwner = "1kemalozturk"
+$repositoryName = "scripts"
+$versionFilePath = "windows/version.txt"  # Path to the file in the GitHub repo that contains the latest version
+$scriptFileName = "windows/oneclick.ps1"  # Script file name in the GitHub repo
 
-    # GitHub repository's raw script URL
-    $scriptUrl = "https://raw.githubusercontent.com/1kemalozturk/scripts/main/windows/oneclick.sh"
-    
-    # Temp file to store the updated script
-    $tempScript = [System.IO.Path]::Combine($env:TEMP, "updated_script.ps1")
-
-    # Fetch the latest version of the script
+function Check-For-Updates {
     try {
-        Invoke-WebRequest -Uri $scriptUrl -OutFile $tempScript -ErrorAction Stop
+        $versionUrl = "https://raw.githubusercontent.com/$repositoryOwner/$repositoryName/main/$versionFilePath"
+        $latestVersion = Invoke-RestMethod -Uri $versionUrl
+
+        if ($latestVersion -ne $scriptVersion) {
+            Write-Output "A new version of the script is available. Updating..."
+            
+            $scriptUrl = "https://raw.githubusercontent.com/$repositoryOwner/$repositoryName/main/$scriptFileName"
+            $updatedScript = Invoke-RestMethod -Uri $scriptUrl
+            
+            $localScriptPath = $MyInvocation.MyCommand.Path
+            Set-Content -Path $localScriptPath -Value $updatedScript -Encoding UTF8
+            
+            Write-Output "Script updated successfully. Please run the script again."
+            exit
+        } else {
+            Write-Output "You are using the latest version of the script."
+        }
     } catch {
-        Write-Host "Failed to download the update."
-        Start-Sleep -Seconds 5
-        Show-Main
-        return
+        Write-Output "Failed to check for updates. Proceeding with the current version."
     }
-
-    # Check if the temp file was created successfully
-    if (-Not (Test-Path -Path $tempScript)) {
-        Write-Host "Failed to download the update."
-        Start-Sleep -Seconds 5
-        Show-Main
-        return
-    }
-
-    # Compute the hash of the local and updated scripts
-    $localHash = Get-FileHash -Path $PSCommandPath -Algorithm SHA256 | Select-Object -ExpandProperty Hash
-    $updatedHash = Get-FileHash -Path $tempScript -Algorithm SHA256 | Select-Object -ExpandProperty Hash
-
-    # Compare the hashes
-    if ($localHash -ne $updatedHash) {
-        Write-Host "Update found. Applying update..."
-        Copy-Item -Path $tempScript -Destination $PSCommandPath -Force
-        Write-Host "Script updated. Please re-run the script."
-        Start-Sleep -Seconds 5
-        Exit
-    } else {
-        Write-Host "No updates available."
-    }
-
-    # Clean up
-    Remove-Item -Path $tempScript -Force
 }
 
 function Install-USBIPD {
