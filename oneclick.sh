@@ -60,7 +60,6 @@ check_for_updates() {
 
     # Clean up
     rm -f "$temp_script"
-    sleep 0
 }
 
 developer_tools() {
