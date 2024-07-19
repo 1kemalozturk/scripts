@@ -460,11 +460,10 @@ homeassistant_install() {
     # Download and install Home Assistant packages
     wget -O os-agent_linux_x86_64.deb https://github.com/home-assistant/os-agent/releases/latest/download/os-agent_1.6.0_linux_x86_64.deb
     wget -O homeassistant-supervised.deb https://github.com/home-assistant/supervised-installer/releases/latest/download/homeassistant-supervised.deb
-    apt install -y ./os-agent_linux_x86_64.deb
-    apt install -y ./homeassistant-supervised.deb
 
-    # Reconfigure dpkg Database
-    dpkg --configure -a
+    # Force install the packages
+    dpkg -i os-agent_linux_x86_64.deb || apt-get install -f -y
+    dpkg -i homeassistant-supervised.deb || apt-get install -f -y
 
     echo "Home Assistant installed."
     sleep 10
