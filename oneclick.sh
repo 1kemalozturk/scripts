@@ -55,7 +55,7 @@ check_for_updates() {
         sleep 5
         exit 0
     else
-        
+        echo "No updates available."
     fi
 
     # Clean up
