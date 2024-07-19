@@ -141,12 +141,14 @@ networking() {
     echo "Networking"
     echo "1. 3x-UI"
     echo "2. AdguardHome"
+    echo "3. Pi-hole"
     echo "0. Back"
     echo -n "Choose an option: "
     read choice
     case $choice in
         1) 3xui ;;
         2) adguardhome ;;
+        3) pihole ;;
         0) show_main ;;
         *) echo "Invalid option!"; sleep 1; networking ;;
     esac
@@ -469,6 +471,40 @@ adguardhome_uninstall() {
     echo "AdguardHome uninstalled."
     sleep 10
     adguardhome
+}
+
+pihole() {
+    clear
+    echo "Pi-hole"
+    echo "1. Install"
+    echo "2. Uninstall"
+    echo "0. Back"
+    echo -n "Choose an option: "
+    read choice
+    case $choice in
+        1) pihole_install ;;
+        2) pihole_uninstall ;;
+        0) show_main ;;
+        *) echo "Invalid option!"; sleep 1; pihole ;;
+    esac
+}
+
+pihole_install(){
+    clear
+    echo "Installing Pi-hole..."
+    curl -sSL https://install.pi-hole.net | bash
+    echo "Pi-hole installed."
+    sleep 10
+    pihole
+}
+
+pihole_uninstall(){
+    clear
+    echo "Uninstalling Pi-hole..."
+    pihole uninstall
+    echo "Pi-hole uninstalled."
+    sleep 10
+    pihole
 }
 
 homeassistant() {
