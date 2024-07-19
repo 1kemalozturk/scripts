@@ -5,11 +5,12 @@
 $scriptUrl = "https://raw.githubusercontent.com/1kemalozturk/scripts/main/windows/oneclick.ps1"
 $tempScriptPath = "$env:TEMP\updated_script.ps1"
 
-function Check-ForUpdates {
+function Check-For-Updates {
     try {
         Write-Output "Checking for updates..."
 
         # Download the latest version of the script
+        Write-Output "Downloading the script from $scriptUrl to $tempScriptPath..."
         Invoke-RestMethod -Uri $scriptUrl -OutFile $tempScriptPath
         
         # Check if the temp file was created successfully
@@ -19,12 +20,16 @@ function Check-ForUpdates {
 
         # Compute the hash of the local and updated scripts
         $localPath = $MyInvocation.MyCommand.Path
+        Write-Output "Local script path: $localPath"
         if (-Not (Test-Path $localPath)) {
             throw "Local script file does not exist."
         }
         
         $localHash = Get-FileHash -Path $localPath -Algorithm SHA256 | Select-Object -ExpandProperty Hash
         $updatedHash = Get-FileHash -Path $tempScriptPath -Algorithm SHA256 | Select-Object -ExpandProperty Hash
+
+        Write-Output "Local script hash: $localHash"
+        Write-Output "Updated script hash: $updatedHash"
 
         # Compare the hashes
         if ($localHash -ne $updatedHash) {
@@ -46,16 +51,19 @@ function Check-ForUpdates {
 }
 
 function Install-USBIPD {
+    cls
     winget install usbipd
     Write-Output "USBIPD successfully installed."
 }
 
 function Uninstall-USBIPD {
+    cls
     winget uninstall usbipd
     Write-Output "USBIPD successfully uninstalled."
 }
 
 function List-USBDevices {
+    cls
     $usbipdList = usbipd list
     Write-Output "Current USB devices:"
     Write-Output $usbipdList
@@ -91,7 +99,7 @@ function Show-Menu {
 }
 
 function Main {
-    Check-ForUpdates
+    Check-For-Updates
     while ($true) {
         Show-Menu
         $choice = Read-Host -Prompt 'Your choice'
