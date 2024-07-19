@@ -75,7 +75,7 @@ check_for_updates() {
     echo "Checking for updates..."
 
     # URL of the raw script from the GitHub repository
-    script_url="https://raw.githubusercontent.com/1kemalozturk/scripts/main/oneclick.sh"
+    script_url="https://raw.githubusercontent.com/1kemalozturk/scripts/main/linux/oneclick.sh"
     
     # Temp file to store the updated script
     temp_script="/tmp/updated_script.sh"

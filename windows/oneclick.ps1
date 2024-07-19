@@ -2,7 +2,7 @@
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 
 # Define the script URL on GitHub
-$scriptUrl = "https://raw.githubusercontent.com/1kemalozturk/scripts/main/oneclick.ps1"
+$scriptUrl = "https://raw.githubusercontent.com/1kemalozturk/scripts/main/windows/oneclick.ps1"
 $tempScriptPath = "$env:TEMP\updated_script.ps1"
 
 function Check-ForUpdates {
