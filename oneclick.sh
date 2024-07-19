@@ -7,7 +7,6 @@ show_main() {
     echo "3. Home & Automation"
     echo "4. Troubleshooting"
     echo "5. System Info"
-    echo "6. Check for Updates"
     echo "0. Exit Script"
     echo -n "Choose an option: "
     read choice
@@ -17,7 +16,6 @@ show_main() {
         3) home_automation ;;
         4) troubleshooting ;;
         5) systeminfo ;;
-        6) check_for_updates ;;
         0) exit 0 ;;
         *) echo "Invalid option!"; sleep 1; show_main ;;
     esac
@@ -433,11 +431,13 @@ homeassistant() {
     esac
 }
 
-homeassistant_install() {
+# Flag file to check the stage of the installation
+FLAG_FILE="/var/local/homeassistant_install_stage"
+
+homeassistant_install_stage1() {
     clear
     echo "Installing Home Assistant..."
 
-    cd /var/local
     apt update
     apt install -y \
         apparmor \
@@ -452,10 +452,25 @@ homeassistant_install() {
         systemd-journal-remote \
         systemd-resolved \
         udisks2 \
-        wget
+        wget \
+        unzip
 
     # Install Docker
     curl -fsSL get.docker.com | sh
+
+    # Create the flag file to indicate the completion of stage 1
+    echo "stage1" > "$FLAG_FILE"
+
+    echo "Docker installed. System will reboot now."
+    sleep 5
+    systemctl reboot
+}
+
+homeassistant_install_stage2() {
+    clear
+    echo "Continuing Home Assistant installation..."
+
+    cd /var/local
 
     # Download and install Home Assistant packages
     wget -O os-agent_linux_x86_64.deb https://github.com/home-assistant/os-agent/releases/latest/download/os-agent_1.6.0_linux_x86_64.deb
@@ -465,11 +480,20 @@ homeassistant_install() {
     dpkg -i os-agent_linux_x86_64.deb || apt-get install -f -y
     dpkg -i homeassistant-supervised.deb || apt-get install -f -y
 
+    # Remove the flag file
+    rm -f "$FLAG_FILE"
+
     echo "Home Assistant installed."
     sleep 10
-    echo "System is restarting..."
-    sleep 10
-    systemctl reboot
+    homeassistant
+}
+
+# Function to check the flag file and continue installation if necessary
+homeassistant_install_check() {
+    if [ -f "$FLAG_FILE" ]; then
+        homeassistant_install_stage2
+        exit 0
+    fi
 }
 
 homeassistant_uninstall() {
@@ -616,4 +640,6 @@ systeminfo_checkPort() {
     systeminfo
 }
 
+check_for_updates
+homeassistant_install_check
 show_main
