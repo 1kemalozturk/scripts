@@ -326,6 +326,9 @@ adguardhome_uninstall() {
     echo "Uninstalling AdguardHome..."
     /opt/AdGuardHome/AdGuardHome -s uninstall
     rm -fr /opt/AdGuardHome
+    systemctl daemon-reload
+    systemctl restart systemd-networkd
+    systemctl restart systemd-resolved
     echo "AdguardHome uninstalled."
     sleep 10
     show_main
