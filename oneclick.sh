@@ -16,7 +16,7 @@ DISK_TOTAL=$(df -h / | grep / | awk '{ print $2 }')
 DISK_USED=$(df -h / | grep / | awk '{ print $3 }')
 
 # Memory usage
-MEMORY_USAGE=$(free -m | awk 'NR==2{printf "%.0f%%", $3*100/$2 }')
+MEMORY_USAGE=$(free -m | grep Mem | awk '{printf "%.0f%%", ($3/$2)*100}')
 
 # Swap usage
 SWAP_USAGE=$(free -m | awk 'NR==3{printf "%.0f%%", $3*100/$2 }')
@@ -40,13 +40,10 @@ show_main() {
     echo ""
     echo "System information as of $DATE"
     echo ""
-    echo "  System load:    $SYSTEM_LOAD"
-    echo "  Usage of /:     $DISK_USAGE of $DISK_TOTAL ($DISK_USED used)"
-    echo "  Memory usage:   $MEMORY_USAGE"
-    echo "  Swap usage:     $SWAP_USAGE"
-    echo "  Processes:      $PROCESSES"
-    echo "  Users logged in:$USERS"
-    echo "  IPv4 address for eth0: $IPV4_ADDRESS"
+    echo "  System load:      $SYSTEM_LOAD                                          Processes:                 $PROCESSES"
+    echo "  Usage of /:       $DISK_USAGE of $DISK_TOTAL ($DISK_USED used)          Users logged in:           $USERS"
+    echo "  Memory usage:     $MEMORY_USAGE                                         IPv4 address for eth0:     $IPV4_ADDRESS"
+    echo "  Swap usage:       $SWAP_USAGE"
     echo ""
     echo ""
     echo "1. Developer Tools"
