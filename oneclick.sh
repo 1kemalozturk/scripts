@@ -55,13 +55,12 @@ check_for_updates() {
         sleep 5
         exit 0
     else
-        echo "No updates available."
+        
     fi
 
     # Clean up
     rm -f "$temp_script"
-    sleep 5
-    show_main
+    sleep 0
 }
 
 developer_tools() {
@@ -423,7 +422,7 @@ homeassistant() {
     echo -n "Choose an option: "
     read choice
     case $choice in
-        1) homeassistant_install ;;
+        1) homeassistant_install_stage1 ;;
         2) homeassistant_uninstall ;;
         3) homeassistant_hacs_install ;;
         0) show_main ;;
