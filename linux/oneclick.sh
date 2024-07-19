@@ -8,7 +8,7 @@ KERNEL_INFO=$(uname -r)
 DATE=$(date)
 
 # System load
-SYSTEM_LOAD=$(uptime | awk -F 'load average:' '{ print $2 }' | cut -d, -f1)
+SYSTEM_LOAD=$(uptime | awk -F 'load average:''{ print $2 }' | cut -d, -f1)
 
 # Disk usage
 DISK_USAGE=$(df -h / | grep / | awk '{ print $5 }')
@@ -47,7 +47,6 @@ show_main() {
     echo "  Processes:              $PROCESSES"
     echo "  Users logged in:        $USERS"
     echo "  IPv4 address for eth0:  $IPV4_ADDRESS"
-    echo ""
     echo ""
     echo "1. Developer Tools"
     echo "2. Networking"
@@ -755,6 +754,7 @@ troubleshooting_dpkg_repair() {
 
     # dpkg: error: 2 expected programs not found in PATH or not executable
     apt --fix-broken install
+
     sleep 10
     troubleshooting
 }
