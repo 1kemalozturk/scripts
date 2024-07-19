@@ -16,7 +16,7 @@ DISK_TOTAL=$(df -h / | grep / | awk '{ print $2 }')
 DISK_USED=$(df -h / | grep / | awk '{ print $3 }')
 
 # Memory usage
-MEMORY_USAGE=$(free -m | grep Mem | awk '{printf "%.0f%%", ($3/$2)*100}')
+MEMORY_USAGE=$(free -m | awk 'NR==2{printf "%.0f%%", $3*100/$2}')
 
 # Swap usage
 SWAP_USAGE=$(free -m | awk 'NR==3{printf "%.0f%%", $3*100/$2 }')
@@ -40,17 +40,21 @@ show_main() {
     echo ""
     echo "System information as of $DATE"
     echo ""
-    echo "  System load:      $SYSTEM_LOAD                                          Processes:                 $PROCESSES"
-    echo "  Usage of /:       $DISK_USAGE of $DISK_TOTAL ($DISK_USED used)          Users logged in:           $USERS"
-    echo "  Memory usage:     $MEMORY_USAGE                                         IPv4 address for eth0:     $IPV4_ADDRESS"
-    echo "  Swap usage:       $SWAP_USAGE"
+    echo "  System load:            $SYSTEM_LOAD"
+    echo "  Usage of /:             $DISK_USAGE of $DISK_TOTAL ($DISK_USED used)"
+    echo "  Memory usage:           $MEMORY_USAGE"
+    echo "  Swap usage:             $SWAP_USAGE"
+    echo "  Processes:              $PROCESSES"
+    echo "  Users logged in:        $USERS"
+    echo "  IPv4 address for eth0:  $IPV4_ADDRESS"
     echo ""
     echo ""
     echo "1. Developer Tools"
     echo "2. Networking"
     echo "3. Home & Automation"
-    echo "4. Troubleshooting"
-    echo "5. System Info"
+    echo "4. AI"
+    echo "5. Tools"
+    echo "6. Troubleshooting"
     echo "0. Exit Script"
     echo -n "Choose an option: "
     read choice
@@ -58,8 +62,9 @@ show_main() {
         1) developer_tools ;;
         2) networking ;;
         3) home_automation ;;
-        4) troubleshooting ;;
-        5) systeminfo ;;
+        4) ai ;;
+        5) tools ;;
+        6) troubleshooting ;;
         0) exit 0 ;;
         *) echo "Invalid option!"; sleep 1; show_main ;;
     esac
@@ -572,6 +577,109 @@ homeassistant_hacs_install() {
     homeassistant
 }
 
+ai() {
+    clear
+    echo "AI"
+    echo "1. Ollama"
+    echo "2. Open-webui"
+    echo "0. Back"
+    echo -n "Choose an option: "
+    read choice
+    case $choice in
+        1) ollama ;;
+        2) open_webui
+        0) show_main ;;
+        *) echo "Invalid option!"; sleep 1; ai ;;
+    esac
+}
+
+ollama() {
+    clear
+    echo "Ollama"
+    echo "1. Install"
+    echo "2. Uninstall"
+    echo "0. Back"
+    echo -n "Choose an option: "
+    read choice
+    case $choice in
+        1) ollama_install ;;
+        2) ollama_uninstall ;;
+        0) show_main ;;
+        *) echo "Invalid option!"; sleep 1; ollama ;;
+    esac
+    sleep 10
+    ollama
+}
+
+ollama_install() {
+    clear
+
+    sleep 10
+    ollama
+}
+
+ollama_uninstall() {
+    clear
+
+    sleep 10
+    ollama
+}
+
+open_webui() {
+    clear
+    echo "Open WebUI"
+    echo "1. Install"
+    echo "2. Uninstall"
+    echo "0. Back"
+    echo -n "Choose an option: "
+    read choice
+    case $choice in
+        1) open_webui_install ;;
+        2) open_webui_uninstall ;;
+        0) show_main ;;
+        *) echo "Invalid option!"; sleep 1; open_webui ;;
+    esac
+    sleep 10
+    open_webui
+}
+
+open_webui_install() {
+    clear
+
+    sleep 10
+    ollama
+}
+
+open_webui_uninstall() {
+    clear
+
+    sleep 10
+    ollama
+}
+
+tools() {
+    clear
+    echo "Tools"
+    echo "1. Check Port"
+    echo "0. Back"
+    echo -n "Choose an option: "
+    read choice
+    case $choice in
+        1) tools_checkPort ;;
+        0) show_main ;;
+        *) echo "Invalid option!"; sleep 1; tools ;;
+    esac
+}
+
+tools_checkPort() {
+    clear
+    echo -n "Check Port: "
+    read checkPort
+    ss -lntp | grep "$checkPort"
+    sleep 10
+    tools
+}
+
 troubleshooting() {
     clear
     echo "Troubleshooting"
@@ -635,51 +743,6 @@ troubleshooting_dpkg_repair() {
     apt --fix-broken install
     sleep 10
     troubleshooting
-}
-
-systeminfo() {
-    clear
-    echo "System Info"
-    echo "1. Lan IP"
-    echo "2. Check Port"
-    echo "0. Back"
-    echo -n "Choose an option: "
-    read choice
-    case $choice in
-        1) systeminfo_lanIP ;;
-        2) systeminfo_checkPort ;;
-        0) show_main ;;
-        *) echo "Invalid option!"; sleep 1; systeminfo ;;
-    esac
-}
-
-systeminfo_lanIP() {
-    clear
-    # Identify the primary network interface by checking the default route.
-    primary_interface=$(ip route | grep default | awk '{print $5}')
-
-    # Try to retrieve the server's primary IP address using 'ip addr'.
-    lan_ip=$(ip addr show $primary_interface | grep -oE 'inet (10\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}|172\.(1[6-9]|2[0-9]|3[0-1])\.[0-9]{1,3}\.[0-9]{1,3}|192\.168\.[0-9]{1,3}\.[0-9]{1,3})' | awk '{print $2}')
-
-    # Check if the result from 'ip addr' is non-empty.
-    if [ -n "$lan_ip" ]; then
-        echo "LAN IP: $lan_ip"
-    else
-        echo "Unable to determine server IP"
-    fi
-
-    sleep 10
-    systeminfo
-}
-
-systeminfo_checkPort() {
-    clear
-    
-    echo -n "Check Port: "
-    read checkPort
-    ss -lntp | grep "$checkPort"
-    sleep 10
-    systeminfo
 }
 
 check_for_updates
