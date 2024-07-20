@@ -521,10 +521,6 @@ homeassistant_install_stage1() {
     clear
     echo "Installing Home Assistant..."
 
-    # Download and install Home Assistant packages
-    wget -O /var/local/os-agent_linux_x86_64.deb https://github.com/home-assistant/os-agent/releases/latest/download/os-agent_1.6.0_linux_x86_64.deb
-    wget -O /var/local/homeassistant-supervised.deb https://github.com/home-assistant/supervised-installer/releases/latest/download/homeassistant-supervised.deb
-
     apt update
     apt install -y \
         apparmor \
@@ -544,6 +540,10 @@ homeassistant_install_stage1() {
 
     # Install Docker
     curl -fsSL get.docker.com | sh
+
+    # Download and install Home Assistant packages
+    wget -O /var/local/os-agent_linux_x86_64.deb https://github.com/home-assistant/os-agent/releases/latest/download/os-agent_1.6.0_linux_x86_64.deb
+    wget -O /var/local/homeassistant-supervised.deb https://github.com/home-assistant/supervised-installer/releases/latest/download/homeassistant-supervised.deb
 
     # Create the flag file to indicate the completion of stage 1
     echo "stage1" > "$HOMEASSISTANT_INSTALL_STAGE"
