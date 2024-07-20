@@ -533,7 +533,7 @@ homeassistant() {
 }
 
 # Flag file to check the stage of the installation
-HOMEASSISTANT_INSTALL="/var/local/homeassistant_install"
+HOMEASSISTANT_INSTALL="homeassistant_install"
 
 # Function to check the flag file and continue installation if necessary
 homeassistant_install_check() {
@@ -546,8 +546,6 @@ homeassistant_install_check() {
 homeassistant_install_stage1() {
     clear
     echo "Installing Home Assistant..."
-
-    cd /var/local
 
     apt update
     apt install -y \
@@ -569,8 +567,8 @@ homeassistant_install_stage1() {
     curl -fsSL get.docker.com | sh
 
     # Download and install Home Assistant packages
-    wget -O ./os-agent_linux_x86_64.deb https://github.com/home-assistant/os-agent/releases/latest/download/os-agent_1.6.0_linux_x86_64.deb
-    wget -O ./homeassistant-supervised.deb https://github.com/home-assistant/supervised-installer/releases/latest/download/homeassistant-supervised.deb
+    wget https://github.com/home-assistant/os-agent/releases/latest/download/os-agent_1.6.0_linux_x86_64.deb
+    wget -O homeassistant-supervised.deb https://github.com/home-assistant/supervised-installer/releases/latest/download/homeassistant-supervised.deb
 
     # Create the flag file to indicate the completion of stage 1
     echo "stage1" > "$HOMEASSISTANT_INSTALL"
@@ -584,13 +582,9 @@ homeassistant_install_stage2() {
     clear
     echo "Installing Home Assistant..."
 
-    cd /var/local
-
     # Install the packages
-    apt install -y ./os-agent_linux_x86_64.deb
-    sleep 2.5
-    apt install -y ./homeassistant-supervised.deb
-    sleep 2.5
+    dpkg -i ./os-agent_1.6.0_linux_x86_64.deb
+    apt install ./homeassistant-supervised.deb
 
     # Remove the flag file
     rm -f "$HOMEASSISTANT_INSTALL"
@@ -617,11 +611,10 @@ homeassistant_uninstall() {
     systemd-resolved \
     udisks2 \
     os-agent
-    sleep 1
-    rm -fr /var/local/os-agent_linux_x86_64.deb /var/local/homeassistant-supervised.deb /var/lib/docker /var/lib/containerd
-    sleep 1
+
+    rm -fr /os-agent_linux_x86_64.deb /homeassistant-supervised.deb /var/lib/docker /var/lib/containerd
     apt-get -y autoremove
-    sleep 1
+
     echo "Home Assistant uninstalled."
     sleep 5
     homeassistant
