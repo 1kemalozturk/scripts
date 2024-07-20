@@ -580,8 +580,8 @@ homeassistant_install() {
             wget -O homeassistant-supervised.deb https://github.com/home-assistant/supervised-installer/releases/latest/download/homeassistant-supervised.deb
 
             apt install ./os-agent_1.6.0_linux_x86_64.deb
-            apt install ./homeassistant-supervised.deb
-            wget -O - https://get.hacs.xyz | bash -
+            apt install -y ./homeassistant-supervised.deb
+            # wget -O - https://get.hacs.xyz | bash -
 
             rm -fr os-agent_linux_x86_64.deb homeassistant-supervised.deb
 
