@@ -524,7 +524,7 @@ homeassistant() {
     echo -n "Choose an option: "
     read choice
     case $choice in
-        1) homeassistant_install_stage1 ;;
+        1) homeassistant_install ;;
         2) homeassistant_uninstall ;;
         3) homeassistant_hacs_install ;;
         0) show_main ;;
@@ -532,22 +532,12 @@ homeassistant() {
     esac
 }
 
-# Flag file to check the stage of the installation
-HOMEASSISTANT_INSTALL="homeassistant_install"
-
-# Function to check the flag file and continue installation if necessary
-homeassistant_install_check() {
-    if [ -f "$HOMEASSISTANT_INSTALL" ]; then
-        homeassistant_install_stage2
-        exit 0
-    fi
-}
-
-homeassistant_install_stage1() {
+homeassistant_install() {
     clear
     echo "Installing Home Assistant..."
 
-    apt update
+    apt update && sudo apt upgrade -y && sudo apt autoremove -y
+    apt --fix-broken install
     apt install -y \
         apparmor \
         cifs-utils \
@@ -570,24 +560,8 @@ homeassistant_install_stage1() {
     wget https://github.com/home-assistant/os-agent/releases/latest/download/os-agent_1.6.0_linux_x86_64.deb
     wget -O homeassistant-supervised.deb https://github.com/home-assistant/supervised-installer/releases/latest/download/homeassistant-supervised.deb
 
-    # Create the flag file to indicate the completion of stage 1
-    echo "stage1" > "$HOMEASSISTANT_INSTALL"
-
-    echo "Docker installed. System will reboot now."
-    sleep 5
-    systemctl reboot
-}
-
-homeassistant_install_stage2() {
-    clear
-    echo "Installing Home Assistant..."
-
-    # Install the packages
     dpkg -i ./os-agent_1.6.0_linux_x86_64.deb
     apt install ./homeassistant-supervised.deb
-
-    # Remove the flag file
-    rm -f "$HOMEASSISTANT_INSTALL"
 
     echo "Home Assistant installed."
     sleep 5
