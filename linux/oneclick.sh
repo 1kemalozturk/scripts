@@ -577,7 +577,7 @@ homeassistant_install_stage1() {
 
             echo "System will reboot now."
             sleep 5
-            systemctl reboot
+            homeassistant
             ;;
         0)
             show_main
