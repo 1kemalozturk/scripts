@@ -567,7 +567,10 @@ homeassistant_install() {
                 systemd-journal-remote \
                 systemd-resolved \
                 udisks2 \
-                wget
+                wget \
+                unzip
+
+            apt remove -y systemd-resolved
 
             # Install Docker
             curl -fsSL get.docker.com | sh
@@ -578,10 +581,9 @@ homeassistant_install() {
 
             apt install ./os-agent_1.6.0_linux_x86_64.deb
             apt install ./homeassistant-supervised.deb
+            wget -O - https://get.hacs.xyz | bash -
 
             rm -fr os-agent_linux_x86_64.deb homeassistant-supervised.deb
-
-            homeassistant_install_hacs
 
             echo "Home Assistant Supervised installation complete."
             sleep 5
@@ -626,16 +628,6 @@ homeassistant_uninstall() {
     sleep 5
     homeassistant
 }
-
-homeassistant_install_hacs() {
-    clear
-    echo "Installing Home Assistant Hacs..."
-    apt-get -y install unzip
-    wget -O - https://get.hacs.xyz | bash -
-    echo "Home Assistant Hacs installed."
-    return
-}
-
 
 ai() {
     clear
