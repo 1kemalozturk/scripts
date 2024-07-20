@@ -522,6 +522,10 @@ homeassistant_install_stage1() {
     clear
     echo "Installing Home Assistant..."
 
+    # Download and install Home Assistant packages
+    wget -O /var/local/os-agent_linux_x86_64.deb https://github.com/home-assistant/os-agent/releases/latest/download/os-agent_1.6.0_linux_x86_64.deb
+    wget -O /var/local/homeassistant-supervised.deb https://github.com/home-assistant/supervised-installer/releases/latest/download/homeassistant-supervised.deb
+
     apt update
     apt install -y \
         apparmor \
@@ -545,24 +549,18 @@ homeassistant_install_stage1() {
     # Create the flag file to indicate the completion of stage 1
     echo "stage1" > "$FLAG_FILE"
 
-    echo "Docker installed. System will reboot now."
+    echo "System will reboot now."
     sleep 5
     systemctl reboot
 }
 
 homeassistant_install_stage2() {
     clear
-    echo "Continuing Home Assistant installation..."
-
-    cd /var/local
-
-    # Download and install Home Assistant packages
-    wget -O os-agent_linux_x86_64.deb https://github.com/home-assistant/os-agent/releases/latest/download/os-agent_1.6.0_linux_x86_64.deb
-    wget -O homeassistant-supervised.deb https://github.com/home-assistant/supervised-installer/releases/latest/download/homeassistant-supervised.deb
+    echo "Installing Home Assistant..."
 
     # Force install the packages
-    dpkg -i os-agent_linux_x86_64.deb || apt-get install -f -y
-    dpkg -i homeassistant-supervised.deb || apt-get install -f -y
+    dpkg -i /var/local/os-agent_linux_x86_64.deb || apt-get install -f -y
+    dpkg -i /var/local/homeassistant-supervised.deb || apt-get install -f -y
     wget -O - https://get.hacs.xyz | bash -
 
     # Remove the flag file
