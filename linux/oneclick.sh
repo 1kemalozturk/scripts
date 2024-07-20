@@ -538,7 +538,6 @@ homeassistant_install_stage1() {
         network-manager \
         nfs-common \
         systemd-journal-remote \
-        systemd-resolved \
         udisks2 \
         wget \
         unzip
@@ -560,7 +559,7 @@ homeassistant_install_stage2() {
 
     # Force install the packages
     dpkg -i /var/local/os-agent_linux_x86_64.deb || apt-get install -f -y
-    dpkg -i /var/local/homeassistant-supervised.deb || apt-get install -f -y
+    dpkg -i --ignore-depends=systemd-resolved /var/local/homeassistant-supervised.deb || apt-get install -f -y
     wget -O - https://get.hacs.xyz | bash -
 
     # Remove the flag file
