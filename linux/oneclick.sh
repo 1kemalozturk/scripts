@@ -88,7 +88,6 @@ check_for_updates() {
     if [[ ! -f "$temp_script" ]]; then
         echo "Failed to download the update."
         sleep 3
-        show_main
         return
     fi
 
@@ -516,8 +515,7 @@ homeassistant() {
 }
 
 # Flag file to check the stage of the installation
-SCRIPT_DIR=$(dirname "$0")
-HOMEASSISTANT_INSTALL_STAGE="$SCRIPT_DIR/homeassistant_install_stage"
+HOMEASSISTANT_INSTALL_STAGE="/var/local/homeassistant_install_stage"
 
 homeassistant_install_stage1() {
     clear
