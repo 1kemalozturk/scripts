@@ -561,7 +561,7 @@ homeassistant_install() {
     wget https://github.com/home-assistant/os-agent/releases/latest/download/os-agent_1.6.0_linux_x86_64.deb
     wget -O homeassistant-supervised.deb https://github.com/home-assistant/supervised-installer/releases/latest/download/homeassistant-supervised.deb
 
-    dpkg -i ./os-agent_1.6.0_linux_x86_64.deb
+    apt install ./os-agent_1.6.0_linux_x86_64.deb
     apt install ./homeassistant-supervised.deb
 
     echo "Home Assistant installed."
