@@ -567,7 +567,6 @@ homeassistant_install() {
                 network-manager \
                 nfs-common \
                 systemd-journal-remote \
-                systemd-resolved \
                 udisks2 \
                 wget \
                 unzip
@@ -580,8 +579,6 @@ homeassistant_install() {
             wget -O homeassistant-supervised.deb https://github.com/home-assistant/supervised-installer/releases/latest/download/homeassistant-supervised.deb
 
             chmod +x os-agent_linux_x86_64.deb homeassistant-supervised.deb
-            apt install ./os-agent_linux_x86_64.deb
-            apt install -y ./homeassistant-supervised.deb
 
             echo "supervised" > "$HOMEASSISTANT_INSTALL_SUPERVISED"
 
@@ -605,8 +602,6 @@ homeassistant_install() {
 }
 
 homeassistant_install_supervised() {
-    apt remove -y systemd-resolved
-
     apt install -y ./os-agent_linux_x86_64.deb
     systemctl enable haos-agent
     systemctl start haos-agent
