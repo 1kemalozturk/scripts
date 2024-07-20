@@ -574,17 +574,13 @@ homeassistant_install_stage1() {
 
             chmod +x os-agent_linux_x86_64.deb homeassistant-supervised.deb
             apt install ./os-agent_linux_x86_64.deb
-            apt remove -y systemd-resolved
-            
             apt install -y ./homeassistant-supervised.deb
-            wget -O - https://get.hacs.xyz | bash -
 
-            rm -fr os-agent_linux_x86_64.deb homeassistant-supervised.deb "$HOMEASSISTANT_INSTALL"
-            # echo "stage1" > "$HOMEASSISTANT_INSTALL"
+            echo "stage1" > "$HOMEASSISTANT_INSTALL"
 
             echo "System will reboot now."
             sleep 5
-            #systemctl reboot
+            systemctl reboot
             ;;
         0)
             homeassistant
@@ -602,8 +598,13 @@ homeassistant_install_stage1() {
 }
 
 homeassistant_install_stage2() {
+    apt remove -y systemd-resolved
+    
+    apt install ./os-agent_linux_x86_64.deb
+    apt install -y ./homeassistant-supervised.deb
+    wget -O - https://get.hacs.xyz | bash -
 
-
+    rm -fr os-agent_linux_x86_64.deb homeassistant-supervised.deb "$HOMEASSISTANT_INSTALL"
     echo "Home Assistant Supervised installation complete."
     sleep 5
     homeassistant
