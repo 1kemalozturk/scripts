@@ -107,6 +107,7 @@ check_for_updates() {
         exit 0
     else
         echo "No updates available."
+        sleep 1
     fi
 
     # Clean up
@@ -764,5 +765,4 @@ troubleshooting_dpkg_repair() {
 }
 
 check_for_updates
-homeassistant_install_check
 show_main
