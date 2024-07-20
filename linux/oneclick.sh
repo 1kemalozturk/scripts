@@ -514,8 +514,34 @@ homeassistant() {
     esac
 }
 
+homeassistant() {
+    clear
+    echo "Home Assistant"
+    echo "1. Install"
+    echo "2. Uninstall"
+    echo "3. Hacs Install"
+    echo "0. Back"
+    echo -n "Choose an option: "
+    read choice
+    case $choice in
+        1) homeassistant_install_stage1 ;;
+        2) homeassistant_uninstall ;;
+        3) homeassistant_hacs_install ;;
+        0) show_main ;;
+        *) echo "Invalid option!"; sleep 1; homeassistant ;;
+    esac
+}
+
 # Flag file to check the stage of the installation
 HOMEASSISTANT_INSTALL_STAGE="/var/local/homeassistant_install_stage"
+
+# Function to check the flag file and continue installation if necessary
+homeassistant_install_check() {
+    if [ -f "$HOMEASSISTANT_INSTALL_STAGE" ]; then
+        homeassistant_install_stage2
+        exit 0
+    fi
+}
 
 homeassistant_install_stage1() {
     clear
@@ -535,20 +561,19 @@ homeassistant_install_stage1() {
         systemd-journal-remote \
         systemd-resolved \
         udisks2 \
-        wget \
-        unzip
+        wget
 
     # Install Docker
     curl -fsSL get.docker.com | sh
 
     # Download and install Home Assistant packages
-    wget -O /var/local/os-agent_linux_x86_64.deb https://github.com/home-assistant/os-agent/releases/latest/download/os-agent_1.6.0_linux_x86_64.deb
-    wget -O /var/local/homeassistant-supervised.deb https://github.com/home-assistant/supervised-installer/releases/latest/download/homeassistant-supervised.deb
+    wget -O os-agent_linux_x86_64.deb https://github.com/home-assistant/os-agent/releases/latest/download/os-agent_1.6.0_linux_x86_64.deb
+    wget -O homeassistant-supervised.deb https://github.com/home-assistant/supervised-installer/releases/latest/download/homeassistant-supervised.deb
 
     # Create the flag file to indicate the completion of stage 1
     echo "stage1" > "$HOMEASSISTANT_INSTALL_STAGE"
 
-    echo "System will reboot now."
+    echo "Docker installed. System will reboot now."
     sleep 5
     systemctl reboot
 }
@@ -557,13 +582,13 @@ homeassistant_install_stage2() {
     clear
     echo "Installing Home Assistant..."
 
-    # Force install the packages
-    dpkg -i /var/local/os-agent_linux_x86_64.deb || apt-get install -f -y
-    sleep 1
-    dpkg -i /var/local/homeassistant-supervised.deb || apt-get install -f -y
-    sleep 1
-    wget -O - https://get.hacs.xyz | bash -
-    sleep 1
+    cd /var/local
+
+    # Install the packages
+    apt install -y ./os-agent_linux_x86_64.deb
+    sleep 2.5
+    apt install -y ./homeassistant-supervised.deb
+    sleep 2.5
 
     # Remove the flag file
     rm -f "$HOMEASSISTANT_INSTALL_STAGE"
@@ -572,15 +597,6 @@ homeassistant_install_stage2() {
     sleep 5
     homeassistant
 }
-
-# Function to check the flag file and continue installation if necessary
-homeassistant_install_check() {
-    if [ -f "$HOMEASSISTANT_INSTALL_STAGE" ]; then
-        homeassistant_install_stage2
-        exit 0
-    fi
-}
-
 
 homeassistant_uninstall() {
     clear
@@ -599,12 +615,26 @@ homeassistant_uninstall() {
     systemd-resolved \
     udisks2 \
     os-agent
+    sleep 1
     rm -fr /var/local/os-agent_linux_x86_64.deb /var/local/homeassistant-supervised.deb /var/lib/docker /var/lib/containerd
+    sleep 1
     apt-get -y autoremove
+    sleep 1
     echo "Home Assistant uninstalled."
-    sleep 10
+    sleep 5
     homeassistant
 }
+
+homeassistant_hacs_install() {
+    clear
+    echo "Installing Home Assistant Hacs..."
+    apt-get -y install unzip
+    wget -O - https://get.hacs.xyz | bash -
+
+    sleep 5
+    homeassistant
+}
+
 
 ai() {
     clear
