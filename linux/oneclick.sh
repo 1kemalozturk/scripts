@@ -559,14 +559,17 @@ homeassistant_install_stage2() {
 
     # Force install the packages
     dpkg -i /var/local/os-agent_linux_x86_64.deb || apt-get install -f -y
+    sleep 1
     dpkg -i /var/local/homeassistant-supervised.deb || apt-get install -f -y
+    sleep 1
     wget -O - https://get.hacs.xyz | bash -
+    sleep 1
 
     # Remove the flag file
     rm -f "$HOMEASSISTANT_INSTALL_STAGE"
 
     echo "Home Assistant installed."
-    sleep 10
+    sleep 5
     homeassistant
 }
 
