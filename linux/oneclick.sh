@@ -72,6 +72,8 @@ show_main() {
 check_for_updates() {
     clear
     echo "Checking for updates..."
+    sleep 2
+    clear
 
     # URL of the raw script from the GitHub repository
     script_url="https://raw.githubusercontent.com/1kemalozturk/scripts/main/linux/oneclick.sh"
@@ -85,7 +87,7 @@ check_for_updates() {
     # Check if the temp file was created successfully
     if [[ ! -f "$temp_script" ]]; then
         echo "Failed to download the update."
-        sleep 5
+        sleep 3
         show_main
         return
     fi
@@ -99,8 +101,10 @@ check_for_updates() {
         echo "Update found. Applying update..."
         cp "$temp_script" "$0"
         chmod +x "$0"
+        sleep 1.5
+        clear
         echo "Script updated. Please re-run the script."
-        sleep 5
+        sleep 1.5
         exit 0
     else
         echo "No updates available."
@@ -108,17 +112,6 @@ check_for_updates() {
 
     # Clean up
     rm -f "$temp_script"
-}
-
-# Flag file to check the stage of the installation
-FLAG_FILE="/var/local/homeassistant_install_stage"
-
-# Function to check the flag file and continue installation if necessary
-check_for_homeassistant_install() {
-    if [ -f "$FLAG_FILE" ]; then
-        homeassistant_install_stage2
-        exit 0
-    fi
 }
 
 developer_tools() {
@@ -506,6 +499,9 @@ pi-hole_uninstall() {
     pi-hole
 }
 
+# Flag file to check the stage of the installation
+FLAG_FILE="/var/local/homeassistant_install_stage"
+
 homeassistant() {
     clear
     echo "Home Assistant"
@@ -599,6 +595,14 @@ homeassistant_uninstall() {
     echo "Home Assistant uninstalled."
     sleep 10
     homeassistant
+}
+
+# Function to check the flag file and continue installation if necessary
+check_for_homeassistant_install() {
+    if [ -f "$FLAG_FILE" ]; then
+        homeassistant_install_stage2
+        exit 0
+    fi
 }
 
 ai() {
