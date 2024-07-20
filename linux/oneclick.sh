@@ -516,7 +516,8 @@ homeassistant() {
 }
 
 # Flag file to check the stage of the installation
-FLAG_FILE="/var/local/homeassistant_install_stage"
+SCRIPT_DIR=$(dirname "$0")
+HOMEASSISTANT_INSTALL_STAGE="$SCRIPT_DIR/homeassistant_install_stage"
 
 homeassistant_install_stage1() {
     clear
@@ -546,7 +547,7 @@ homeassistant_install_stage1() {
     curl -fsSL get.docker.com | sh
 
     # Create the flag file to indicate the completion of stage 1
-    echo "stage1" > "$FLAG_FILE"
+    echo "stage1" > "$HOMEASSISTANT_INSTALL_STAGE"
 
     echo "System will reboot now."
     sleep 5
@@ -563,7 +564,7 @@ homeassistant_install_stage2() {
     wget -O - https://get.hacs.xyz | bash -
 
     # Remove the flag file
-    rm -f "$FLAG_FILE"
+    rm -f "$HOMEASSISTANT_INSTALL_STAGE"
 
     echo "Home Assistant installed."
     sleep 10
@@ -572,7 +573,7 @@ homeassistant_install_stage2() {
 
 # Function to check the flag file and continue installation if necessary
 homeassistant_install_check() {
-    if [ -f "$FLAG_FILE" ]; then
+    if [ -f "$HOMEASSISTANT_INSTALL_STAGE" ]; then
         homeassistant_install_stage2
         exit 0
     fi
