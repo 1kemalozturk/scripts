@@ -533,11 +533,11 @@ homeassistant() {
 }
 
 # Flag file to check the stage of the installation
-HOMEASSISTANT_INSTALL_STAGE="/var/local/homeassistant_install_stage"
+HOMEASSISTANT_INSTALL="/var/local/homeassistant_install"
 
 # Function to check the flag file and continue installation if necessary
 homeassistant_install_check() {
-    if [ -f "$HOMEASSISTANT_INSTALL_STAGE" ]; then
+    if [ -f "$HOMEASSISTANT_INSTALL" ]; then
         homeassistant_install_stage2
         exit 0
     fi
@@ -573,7 +573,7 @@ homeassistant_install_stage1() {
     wget -O ./homeassistant-supervised.deb https://github.com/home-assistant/supervised-installer/releases/latest/download/homeassistant-supervised.deb
 
     # Create the flag file to indicate the completion of stage 1
-    echo "stage1" > "$HOMEASSISTANT_INSTALL_STAGE"
+    echo "stage1" > "$HOMEASSISTANT_INSTALL"
 
     echo "Docker installed. System will reboot now."
     sleep 5
@@ -593,7 +593,7 @@ homeassistant_install_stage2() {
     sleep 2.5
 
     # Remove the flag file
-    rm -f "$HOMEASSISTANT_INSTALL_STAGE"
+    rm -f "$HOMEASSISTANT_INSTALL"
 
     echo "Home Assistant installed."
     sleep 5
