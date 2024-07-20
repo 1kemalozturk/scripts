@@ -499,9 +499,6 @@ pi-hole_uninstall() {
     pi-hole
 }
 
-# Flag file to check the stage of the installation
-FLAG_FILE="/var/local/homeassistant_install_stage"
-
 homeassistant() {
     clear
     echo "Home Assistant"
@@ -517,6 +514,9 @@ homeassistant() {
         *) echo "Invalid option!"; sleep 1; homeassistant ;;
     esac
 }
+
+# Flag file to check the stage of the installation
+FLAG_FILE="/var/local/homeassistant_install_stage"
 
 homeassistant_install_stage1() {
     clear
@@ -573,6 +573,15 @@ homeassistant_install_stage2() {
     homeassistant
 }
 
+# Function to check the flag file and continue installation if necessary
+homeassistant_install_check() {
+    if [ -f "$FLAG_FILE" ]; then
+        homeassistant_install_stage2
+        exit 0
+    fi
+}
+
+
 homeassistant_uninstall() {
     clear
     echo "Uninstalling Home Assistant..."
@@ -595,14 +604,6 @@ homeassistant_uninstall() {
     echo "Home Assistant uninstalled."
     sleep 10
     homeassistant
-}
-
-# Function to check the flag file and continue installation if necessary
-check_for_homeassistant_install() {
-    if [ -f "$FLAG_FILE" ]; then
-        homeassistant_install_stage2
-        exit 0
-    fi
 }
 
 ai() {
@@ -764,5 +765,5 @@ troubleshooting_dpkg_repair() {
 }
 
 check_for_updates
-check_for_homeassistant_install
+homeassistant_install_check
 show_main
