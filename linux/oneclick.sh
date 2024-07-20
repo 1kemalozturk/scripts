@@ -515,23 +515,18 @@ homeassistant() {
     esac
 }
 
-homeassistant() {
-    clear
-    echo "Home Assistant"
-    echo "1. Install"
-    echo "2. Uninstall"
-    echo "0. Back"
-    echo -n "Choose an option: "
-    read choice
-    case $choice in
-        1) homeassistant_install ;;
-        2) homeassistant_uninstall ;;
-        0) show_main ;;
-        *) echo "Invalid option!"; sleep 1; homeassistant ;;
-    esac
+# Flag file to check the stage of the installation
+HOMEASSISTANT_INSTALL="homeassistant_install"
+
+# Function to check the flag file and continue installation if necessary
+homeassistant_install_check() {
+    if [ -f "$HOMEASSISTANT_INSTALL" ]; then
+        homeassistant_install_stage2
+        exit 0
+    fi
 }
 
-homeassistant_install() {
+homeassistant_install_stage1() {
     clear
     echo "Home Assistant Installation"
     echo "1. Home Assistant Container"
@@ -570,8 +565,6 @@ homeassistant_install() {
                 wget \
                 unzip
 
-            apt remove -y systemd-resolved
-
             # Install Docker
             curl -fsSL get.docker.com | sh
 
@@ -579,14 +572,11 @@ homeassistant_install() {
             wget https://github.com/home-assistant/os-agent/releases/latest/download/os-agent_1.6.0_linux_x86_64.deb
             wget -O homeassistant-supervised.deb https://github.com/home-assistant/supervised-installer/releases/latest/download/homeassistant-supervised.deb
 
-            apt install ./os-agent_1.6.0_linux_x86_64.deb
-            apt install -y ./homeassistant-supervised.deb
-            # wget -O - https://get.hacs.xyz | bash -
+            echo "stage1" > "$HOMEASSISTANT_INSTALL"
 
-            rm -fr os-agent_linux_x86_64.deb homeassistant-supervised.deb
-
-            echo "Home Assistant Supervised installation complete."
+            echo "System will reboot now."
             sleep 5
+            systemctl reboot
             ;;
         0)
             show_main
@@ -595,10 +585,25 @@ homeassistant_install() {
         *)
             echo "Invalid option!"
             sleep 1
-            homeassistant_install
+            homeassistant_install_stage1
             return
             ;;
     esac
+    sleep 5
+    homeassistant
+}
+
+homeassistant_install_stage2() {
+    apt remove -y systemd-resolved
+
+    apt install ./os-agent_1.6.0_linux_x86_64.deb
+    apt install -y ./homeassistant-supervised.deb
+    wget -O - https://get.hacs.xyz | bash -
+
+    rm -fr os-agent_linux_x86_64.deb homeassistant-supervised.deb
+    rm -f "$HOMEASSISTANT_INSTALL"
+
+    echo "Home Assistant Supervised installation complete."
     sleep 5
     homeassistant
 }
@@ -788,4 +793,5 @@ troubleshooting_dpkg_repair() {
 }
 
 check_for_updates
+homeassistant_install_check
 show_main
