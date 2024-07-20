@@ -572,6 +572,7 @@ homeassistant_install_stage1() {
             wget https://github.com/home-assistant/os-agent/releases/latest/download/os-agent_1.6.0_linux_x86_64.deb
             wget -O homeassistant-supervised.deb https://github.com/home-assistant/supervised-installer/releases/latest/download/homeassistant-supervised.deb
 
+            chmod +x os-agent_1.6.0_linux_x86_64.deb homeassistant-supervised.deb
             echo "stage1" > "$HOMEASSISTANT_INSTALL"
 
             echo "System will reboot now."
