@@ -595,9 +595,9 @@ homeassistant_install_stage1() {
 }
 
 homeassistant_install_stage2() {
-    apt remove -y systemd-resolved
-
     apt install ./os-agent_linux_x86_64.deb
+    apt remove -y systemd-resolved
+    
     apt install -y ./homeassistant-supervised.deb
     wget -O - https://get.hacs.xyz | bash -
 
