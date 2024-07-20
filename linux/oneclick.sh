@@ -520,14 +520,12 @@ homeassistant() {
     echo "Home Assistant"
     echo "1. Install"
     echo "2. Uninstall"
-    echo "3. Hacs Install"
     echo "0. Back"
     echo -n "Choose an option: "
     read choice
     case $choice in
         1) homeassistant_install ;;
         2) homeassistant_uninstall ;;
-        3) homeassistant_hacs_install ;;
         0) show_main ;;
         *) echo "Invalid option!"; sleep 1; homeassistant ;;
     esac
@@ -535,36 +533,70 @@ homeassistant() {
 
 homeassistant_install() {
     clear
-    echo "Installing Home Assistant..."
+    echo "Home Assistant Installation"
+    echo "1. Home Assistant Container"
+    echo "2. Home Assistant Supervised (Debian Only)"
+    echo "0. Back"
+    echo -n "Choose an option: "
+    read choice
 
-    apt update && sudo apt upgrade -y && sudo apt autoremove -y
-    apt --fix-broken install
-    apt install -y \
-        apparmor \
-        cifs-utils \
-        curl \
-        dbus \
-        jq \
-        libglib2.0-bin \
-        lsb-release \
-        network-manager \
-        nfs-common \
-        systemd-journal-remote \
-        systemd-resolved \
-        udisks2 \
-        wget
+    case $choice in
+        1)
+            clear
+            echo "Starting Home Assistant Container installation..."
 
-    # Install Docker
-    curl -fsSL get.docker.com | sh
+            echo "Home Assistant Container installation complete."
+            sleep 5
+            ;;
+        2)
+            clear
+            echo "Starting Home Assistant Supervised installation..."
 
-    # Download and install Home Assistant packages
-    wget https://github.com/home-assistant/os-agent/releases/latest/download/os-agent_1.6.0_linux_x86_64.deb
-    wget -O homeassistant-supervised.deb https://github.com/home-assistant/supervised-installer/releases/latest/download/homeassistant-supervised.deb
+            apt update && sudo apt upgrade -y && sudo apt autoremove -y
+            apt --fix-broken install
+            apt install -y \
+                apparmor \
+                cifs-utils \
+                curl \
+                dbus \
+                jq \
+                libglib2.0-bin \
+                lsb-release \
+                network-manager \
+                nfs-common \
+                systemd-journal-remote \
+                systemd-resolved \
+                udisks2 \
+                wget
 
-    apt install ./os-agent_1.6.0_linux_x86_64.deb
-    apt install ./homeassistant-supervised.deb
+            # Install Docker
+            curl -fsSL get.docker.com | sh
 
-    echo "Home Assistant installed."
+            # Download and install Home Assistant packages
+            wget https://github.com/home-assistant/os-agent/releases/latest/download/os-agent_1.6.0_linux_x86_64.deb
+            wget -O homeassistant-supervised.deb https://github.com/home-assistant/supervised-installer/releases/latest/download/homeassistant-supervised.deb
+
+            apt install ./os-agent_1.6.0_linux_x86_64.deb
+            apt install ./homeassistant-supervised.deb
+
+            rm -fr os-agent_linux_x86_64.deb homeassistant-supervised.deb
+
+            homeassistant_install_hacs
+
+            echo "Home Assistant Supervised installation complete."
+            sleep 5
+            ;;
+        0)
+            show_main
+            return
+            ;;
+        *)
+            echo "Invalid option!"
+            sleep 1
+            homeassistant_install
+            return
+            ;;
+    esac
     sleep 5
     homeassistant
 }
@@ -587,7 +619,7 @@ homeassistant_uninstall() {
     udisks2 \
     os-agent
 
-    rm -fr /os-agent_linux_x86_64.deb /homeassistant-supervised.deb /var/lib/docker /var/lib/containerd
+    rm -fr /var/lib/docker /var/lib/containerd
     apt-get -y autoremove
 
     echo "Home Assistant uninstalled."
@@ -595,14 +627,13 @@ homeassistant_uninstall() {
     homeassistant
 }
 
-homeassistant_hacs_install() {
+homeassistant_install_hacs() {
     clear
     echo "Installing Home Assistant Hacs..."
     apt-get -y install unzip
     wget -O - https://get.hacs.xyz | bash -
-
-    sleep 5
-    homeassistant
+    echo "Home Assistant Hacs installed."
+    return
 }
 
 
