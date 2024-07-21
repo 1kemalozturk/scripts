@@ -566,24 +566,25 @@ homeassistant_install_supervised_check() {
 }
 
 homeassistant_install() {
+    clear
     echo "Starting Home Assistant Supervised installation..."
 
     apt update && sudo apt upgrade -y && sudo apt autoremove -y
-    apt --fix-broken install
-    apt install -y
-    apparmor
-    cifs-utils
-    curl
-    dbus
-    jq
-    libglib2.0-bin
-    lsb-release
-    network-manager
-    nfs-common
-    systemd-journal-remote
-    systemd-resolved
-    udisks2
-    wget
+    apt install \
+    apparmor \
+    bluez \
+    cifs-utils \
+    curl \
+    dbus \
+    jq \
+    libglib2.0-bin \
+    lsb-release \
+    network-manager \
+    nfs-common \
+    systemd-journal-remote \
+    systemd-resolved \
+    udisks2 \
+    wget -y
 
     # Update /etc/systemd/resolved.conf
     echo "Updating /etc/systemd/resolved.conf with disabling DNSStubListener..."
@@ -631,6 +632,8 @@ homeassistant_install() {
 }
 
 homeassistant_install_supervised() {
+    apt install -y bluez
+    apt --fix-broken install
     apt install -y ./os-agent_linux_x86_64.deb
     dpkg -i --ignore-depends=systemd-resolved homeassistant-supervised.deb
 
