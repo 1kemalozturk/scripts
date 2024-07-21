@@ -588,16 +588,6 @@ homeassistant_install() {
     udisks2 \
     wget -y
 
-    # Update /etc/systemd/resolved.conf
-    echo "Updating /etc/systemd/resolved.conf with disabling DNSStubListener..."
-
-    # Use 'sed' to uncomment and set the DNSStubListener options
-    sed -i 's/^#DNSStubListener=.*/DNSStubListener=no/g' /etc/systemd/resolved.conf
-
-    # Restart systemd-resolved service
-    echo "Restarting systemd-resolved service..."
-    sudo systemctl restart systemd-resolved
-
     # Check the status of name resolution
     echo "Checking name resolution..."
     if ping -c 1 checkonline.home-assistant.io &>/dev/null; then
@@ -629,22 +619,51 @@ homeassistant_install() {
         systemctl reboot
     else
         echo "Name resolution is not working. Please check your DNS configuration."
+
+        # Update /etc/systemd/resolved.conf
+        echo "Updating /etc/systemd/resolved.conf with disabling DNSStubListener..."
+
+        # Use 'sed' to uncomment and set the DNSStubListener options
+        sed -i 's/^#DNSStubListener=.*/DNSStubListener=no/g' /etc/systemd/resolved.conf
+
+        # Restart systemd-resolved service
+        echo "Restarting systemd-resolved service..."
+        sudo systemctl restart systemd-resolved
         sleep 5
-        homeassistant
+        homeassistant_install
     fi
 }
 
 homeassistant_install_supervised() {
-    apt install -y bluez
-    apt --fix-broken install
-    apt install -y ./os-agent_linux_x86_64.deb
-    dpkg -i --ignore-depends=systemd-resolved homeassistant-supervised.deb
+    clear
+    # Check the status of name resolution
+    echo "Checking name resolution..."
+    if ping -c 1 checkonline.home-assistant.io &>/dev/null; then
+        apt install -y bluez
+        apt --fix-broken install
+        apt install -y ./os-agent_linux_x86_64.deb
+        dpkg -i --ignore-depends=systemd-resolved homeassistant-supervised.deb
 
-    apt remove -y systemd-resolved
-    rm -fr os-agent_linux_x86_64.deb homeassistant-supervised.deb "$HOMEASSISTANT_INSTALL"
-    echo "Home Assistant Supervised installation complete."
-    sleep 5
-    systemctl reboot
+        apt remove -y systemd-resolved
+        rm -fr os-agent_linux_x86_64.deb homeassistant-supervised.deb "$HOMEASSISTANT_INSTALL"
+        echo "Home Assistant Supervised installation complete."
+        sleep 5
+        homeassistant
+    else
+        echo "Name resolution is not working. Please check your DNS configuration."
+
+        # Update /etc/systemd/resolved.conf
+        echo "Updating /etc/systemd/resolved.conf with disabling DNSStubListener..."
+
+        # Use 'sed' to uncomment and set the DNSStubListener options
+        sed -i 's/^#DNSStubListener=.*/DNSStubListener=no/g' /etc/systemd/resolved.conf
+
+        # Restart systemd-resolved service
+        echo "Restarting systemd-resolved service..."
+        sudo systemctl restart systemd-resolved
+        sleep 5
+        homeassistant_install_supervised
+    fi
 }
 
 homeassistant_uninstall() {
