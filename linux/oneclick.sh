@@ -47,7 +47,7 @@ show_main() {
     echo "  Users logged in:        $USERS"
     echo "  IPv4 address for eth0:  $IPV4_ADDRESS"
     echo ""
-    echo "1. Developer Tools"
+    echo "1. Developer"
     echo "2. Networking"
     echo "3. Home & Automation"
     echo "4. AI"
@@ -57,7 +57,7 @@ show_main() {
     echo -n "Choose an option: "
     read choice
     case $choice in
-    1) developer_tools ;;
+    1) developer ;;
     2) networking ;;
     3) home_automation ;;
     4) ai ;;
@@ -117,9 +117,9 @@ check_for_updates() {
     rm -f "$temp_script"
 }
 
-developer_tools() {
+developer() {
     clear
-    echo "Developer Tools"
+    echo "Developer"
     echo "1. Usbip WSL/HYPERV"
     echo "0. Back"
     echo -n "Choose an option: "
@@ -130,7 +130,7 @@ developer_tools() {
     *)
         echo "Invalid option!"
         sleep 1
-        developer_tools
+        developer
         ;;
     esac
 }
@@ -539,12 +539,14 @@ homeassistant() {
     echo "Home Assistant"
     echo "1. Install"
     echo "2. Uninstall"
+    echo "3. Managment"
     echo "0. Back"
     echo -n "Choose an option: "
     read choice
     case $choice in
     1) homeassistant_install ;;
     2) homeassistant_uninstall ;;
+    3) homeassistant_managment ;;
     0) show_main ;;
     *)
         echo "Invalid option!"
@@ -555,11 +557,11 @@ homeassistant() {
 }
 
 # Flag file to check the stage of the installation
-HOMEASSISTANT_INSTALL_SUPERVISED="homeassistant_install_supervised"
+HOMEASSISTANT_INSTALL="homeassistant_install"
 
 # Function to check the flag file and continue installation if necessary
-homeassistant_install_supervised_check() {
-    if [ -f "$HOMEASSISTANT_INSTALL_SUPERVISED" ]; then
+homeassistant_install_check() {
+    if [ -f "$HOMEASSISTANT_INSTALL" ]; then
         homeassistant_install_supervised
         exit 0
     fi
@@ -624,7 +626,7 @@ homeassistant_install() {
 
     chmod 777 os-agent_linux_x86_64.deb homeassistant-supervised.deb
 
-    echo "supervised" >"$HOMEASSISTANT_INSTALL_SUPERVISED"
+    echo "supervised" >"$HOMEASSISTANT_INSTALL"
 
     echo "System is restarting..."
     sleep 5
@@ -638,7 +640,7 @@ homeassistant_install_supervised() {
     dpkg -i --ignore-depends=systemd-resolved homeassistant-supervised.deb
 
     apt remove -y systemd-resolved
-    rm -fr os-agent_linux_x86_64.deb homeassistant-supervised.deb "$HOMEASSISTANT_INSTALL_SUPERVISED"
+    rm -fr os-agent_linux_x86_64.deb homeassistant-supervised.deb "$HOMEASSISTANT_INSTALL"
     echo "Home Assistant Supervised installation complete."
     sleep 5
     systemctl reboot
@@ -671,7 +673,10 @@ homeassistant_uninstall() {
 }
 
 homeassistant_hacs() {
+    clear
     wget -O - https://get.hacs.xyz | bash -
+    sleep 10
+    homeassistant
 }
 
 ai() {
@@ -786,12 +791,16 @@ open-webui_uninstall() {
 tools() {
     clear
     echo "Tools"
-    echo "1. Check Port"
+    echo "1. Netstat"
+    echo "2. Speedtest"
+    echo "3. IPerf3"
     echo "0. Back"
     echo -n "Choose an option: "
     read choice
     case $choice in
-    1) tools_checkPort ;;
+    1) tools_netstat ;;
+    2) tools_speedtest ;;
+    3) tools_iperf3 ;;
     0) show_main ;;
     *)
         echo "Invalid option!"
@@ -801,19 +810,10 @@ tools() {
     esac
 }
 
-tools_checkPort() {
-    clear
-    echo -n "Check Port: "
-    read checkPort
-    ss -lntp | grep "$checkPort"
-    sleep 10
-    tools
-}
-
 troubleshooting() {
     clear
     echo "Troubleshooting"
-    echo "1. Monitor for Uninstallations"
+    echo "1. Cleaner"
     echo "2. DPKG Repair"
     echo "0. Back"
     echo -n "Choose an option: "
@@ -831,7 +831,7 @@ troubleshooting() {
 }
 
 # Function to monitor for package removal events
-troubleshooting_monitor_uninstall() {
+troubleshooting_cleaner() {
     clear
 
     # Remove configuration files
@@ -853,5 +853,5 @@ troubleshooting_dpkg_repair() {
 }
 
 check_for_updates
-homeassistant_install_supervised_check
+homeassistant_install_check
 show_main
