@@ -618,7 +618,7 @@ homeassistant_install() {
         sleep 5
         systemctl reboot
     else
-        echo "Name resolution is not working. Please check your DNS configuration."
+        echo "Name resolution not working. Starting automatic repair..."
 
         # Update /etc/systemd/resolved.conf
         echo "Updating /etc/systemd/resolved.conf with disabling DNSStubListener..."
@@ -642,7 +642,7 @@ homeassistant_install_supervised() {
         apt install -y bluez
         apt --fix-broken install
         apt install -y ./os-agent_linux_x86_64.deb
-        dpkg -i --ignore-depends=systemd-resolved homeassistant-supervised.deb
+        BYPASS_OS_CHECK=true dpkg -i --ignore-depends=systemd-resolved homeassistant-supervised.deb
 
         apt remove -y systemd-resolved
         rm -fr os-agent_linux_x86_64.deb homeassistant-supervised.deb "$HOMEASSISTANT_INSTALL"
@@ -650,7 +650,7 @@ homeassistant_install_supervised() {
         sleep 5
         homeassistant
     else
-        echo "Name resolution is not working. Please check your DNS configuration."
+        echo "Name resolution not working. Starting automatic repair..."
 
         # Update /etc/systemd/resolved.conf
         echo "Updating /etc/systemd/resolved.conf with disabling DNSStubListener..."
@@ -684,7 +684,6 @@ homeassistant_uninstall() {
         sleep 5
     fi
     sleep 5
-    docker system prune -a -f >/dev/null 2>&1
     docker system prune -a -f >/dev/null 2>&1
 
     echo "Home Assistant uninstalled."
