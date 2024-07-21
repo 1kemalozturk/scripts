@@ -583,7 +583,18 @@ homeassistant_install() {
             dpkg -i systemd-resolved_1.0_all.deb
 
             # Install Docker
-            curl -fsSL get.docker.com | sh
+            if [ -x "$(command -v docker)" ]; then
+                print_info "Docker is already installed."
+            else
+                print_info "Docker is being installed..."
+                curl -fsSL get.docker.com -o get-docker.sh && sh get-docker.sh
+
+                if [[ -n "${SUDO_USER}" ]] ; then 
+                usermod -aG docker "$SUDO_USER"
+                fi
+                rm -f get-docker.sh
+                print_info "Docker installed."
+            fi
 
             # Download and install Home Assistant packages
             wget -O os-agent_linux_x86_64.deb https://github.com/home-assistant/os-agent/releases/latest/download/os-agent_1.6.0_linux_x86_64.deb
@@ -629,23 +640,24 @@ homeassistant_install_supervised() {
 homeassistant_uninstall() {
     clear
     echo "Uninstalling Home Assistant..."
-    apt-get remove -y --purge docker-ce docker-ce-cli containerd.io
-    apt remove -y \
-    apparmor \
-    cifs-utils \
-    dbus \
-    jq \
-    libglib2.0-bin \
-    lsb-release \
-    network-manager \
-    nfs-common \
-    systemd-journal-remote \
-    systemd-resolved \
-    udisks2 \
-    os-agent
 
-    rm -fr /var/lib/docker /var/lib/containerd
-    apt-get -y autoremove
+    systemctl stop haos-agent > /dev/null 2>&1
+    systemctl stop hassio-apparmor > /dev/null 2>&1
+    systemctl stop hassio-supervisor > /dev/null 2>&1
+    apt-get purge -y homeassistant-supervised\* > /dev/null 2>&1 || true
+    dpkg -r homeassistant-supervised > /dev/null 2>&1 || true
+    dpkg -r homeassistant-supervised-jethome > /dev/null 2>&1 || true
+    dpkg -r os-agent > /dev/null 2>&1
+    docker ps --format json|jq -r .Names | grep -E 'addon_|hassio_' | xargs -n 1 docker stop || true
+    sleep 1
+    if [ -n "$(docker ps --format json|jq -r .Names | grep -E 'addon_|hassio_')" ]; then
+        print_info "Konteynerlerin durması bekleniyor"
+        docker ps --format json|jq -r .Names | grep -E 'addon_|hassio_' | xargs -n 1 docker stop  || true
+        sleep 5
+    fi
+    sleep 5
+    docker system prune -a -f > /dev/null 2>&1
+    docker system prune -a -f > /dev/null 2>&1
 
     echo "Home Assistant uninstalled."
     sleep 5
