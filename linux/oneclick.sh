@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # OS and Kernel information
-OS_INFO=$(lsb_release -d | awk -F"t" '{print $2}')
+OS_INFO=$(lsb_release -d | awk -F"\t" '{print $2}')
 KERNEL_INFO=$(uname -r)
 
 # System time
@@ -28,7 +28,7 @@ PROCESSES=$(ps aux --no-heading | wc -l)
 USERS=$(who | wc -l)
 
 # Network information
-IPV4_ADDRESS=$(ip -4 addr show eth0 | grep -oP '(?<=inets)d (.d ){3}')
+IPV4_ADDRESS=$(ip -4 addr show eth0 | grep -oP '(?<=inet\s)\d+(\.\d+){3}')
 
 show_main() {
     clear
