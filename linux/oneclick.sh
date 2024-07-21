@@ -102,7 +102,7 @@ check_for_updates() {
     if [[ "$local_hash" != "$updated_hash" ]]; then
         echo "Update found. Applying update..."
         cp "$temp_script" "$0"
-        chmod x "$0"
+        chmod +x "$0"
         sleep 1.5
         clear
         echo "Script updated. Please re-run the script."
@@ -370,7 +370,7 @@ usbip attach -r "$host_ip" -b "$bus_id"" | tee $script_file >/dev/null
     fi
 
     # Make the script executable
-    chmod x $script_file
+    chmod +x $script_file
 
     # Reload systemd, enable, and start the service
     systemctl daemon-reload
@@ -598,7 +598,7 @@ homeassistant_install() {
 
     # Check the status of name resolution
     echo "Checking name resolution..."
-    if ping -c 1 google.com &>/dev/null; then
+    if ping -c 1 checkonline.home-assistant.io &>/dev/null; then
         echo "Name resolution is working."
     else
         echo "Name resolution is not working. Please check your DNS configuration."
