@@ -602,35 +602,36 @@ homeassistant_install() {
     echo "Checking name resolution..."
     if ping -c 1 checkonline.home-assistant.io &>/dev/null; then
         echo "Name resolution is working."
+        
+        # Install Docker
+        if [ -x "$(command -v docker)" ]; then
+            print_info "Docker is already installed."
+        else
+            print_info "Docker is being installed..."
+            curl -fsSL get.docker.com -o get-docker.sh && sh get-docker.sh
+
+            if [[ -n "${SUDO_USER}" ]]; then
+                usermod -aG docker "$SUDO_USER"
+            fi
+            rm -f get-docker.sh
+            print_info "Docker installed."
+        fi
+
+        # Download and install Home Assistant packages
+        wget -O os-agent_linux_x86_64.deb https://github.com/home-assistant/os-agent/releases/latest/download/os-agent_1.6.0_linux_x86_64.deb
+        wget -O homeassistant-supervised.deb https://github.com/home-assistant/supervised-installer/releases/latest/download/homeassistant-supervised.deb
+
+        chmod 777 os-agent_linux_x86_64.deb homeassistant-supervised.deb
+
+        echo "supervised" >"$HOMEASSISTANT_INSTALL"
+        echo "System is restarting..."
+        sleep 5
+        systemctl reboot
     else
         echo "Name resolution is not working. Please check your DNS configuration."
+        sleep 5
+        homeassistant
     fi
-
-    # Install Docker
-    if [ -x "$(command -v docker)" ]; then
-        print_info "Docker is already installed."
-    else
-        print_info "Docker is being installed..."
-        curl -fsSL get.docker.com -o get-docker.sh && sh get-docker.sh
-
-        if [[ -n "${SUDO_USER}" ]]; then
-            usermod -aG docker "$SUDO_USER"
-        fi
-        rm -f get-docker.sh
-        print_info "Docker installed."
-    fi
-
-    # Download and install Home Assistant packages
-    wget -O os-agent_linux_x86_64.deb https://github.com/home-assistant/os-agent/releases/latest/download/os-agent_1.6.0_linux_x86_64.deb
-    wget -O homeassistant-supervised.deb https://github.com/home-assistant/supervised-installer/releases/latest/download/homeassistant-supervised.deb
-
-    chmod 777 os-agent_linux_x86_64.deb homeassistant-supervised.deb
-
-    echo "supervised" >"$HOMEASSISTANT_INSTALL"
-
-    echo "System is restarting..."
-    sleep 5
-    systemctl reboot
 }
 
 homeassistant_install_supervised() {
