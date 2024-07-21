@@ -567,20 +567,33 @@ homeassistant_install() {
                 network-manager \
                 nfs-common \
                 systemd-journal-remote \
+                systemd-resolved \
                 udisks2 \
                 wget \
-                equivs \
                 unzip
             
-            # Or you can create a fake systemd-resolved package using equivs which will satisfy the missing dependency.
-            # Generate a template control file
-            equivs-control systemd-resolved.control
-            # Fix the package name
-            sed -i 's/<package name; defaults to equivs-dummy>/systemd-resolved/g' systemd-resolved.control
-            # Build the package
-            equivs-build systemd-resolved.control
-            # Install it
-            dpkg -i systemd-resolved_1.0_all.deb
+            # Define the DNS server address
+            DNS_SERVER="192.168.1.1"
+
+            # Update /etc/systemd/resolved.conf
+            echo "Updating /etc/systemd/resolved.conf with DNS server and disabling DNSStubListener..."
+
+            # Use 'sed' to uncomment and set the DNS and DNSStubListener options
+            sed -i 's/^#DNS=.*/DNS='"$DNS_SERVER"'/g' /etc/systemd/resolved.conf
+            sed -i 's/^#DNSStubListener=.*/DNSStubListener=no/g' /etc/systemd/resolved.conf
+
+            # Restart systemd-resolved service
+            echo "Restarting systemd-resolved service..."
+            sudo systemctl restart systemd-resolved
+
+            # Check the status of name resolution
+            echo "Checking name resolution..."
+            if ping -c 1 google.com &> /dev/null; then
+                echo "Name resolution is working."
+            else
+                echo "Name resolution is not working. Please check your DNS configuration."
+            fi
+
 
             # Install Docker
             if [ -x "$(command -v docker)" ]; then
@@ -625,16 +638,16 @@ homeassistant_install() {
 
 homeassistant_install_supervised() {
     apt install -y ./os-agent_linux_x86_64.deb
-
-    sleep 3
-
     dpkg -i --ignore-depends=systemd-resolved homeassistant-supervised.deb
     wget -O - https://get.hacs.xyz | bash -
 
+    apt remove -y systemd-resolved
     rm -fr os-agent_linux_x86_64.deb homeassistant-supervised.deb "$HOMEASSISTANT_INSTALL_SUPERVISED"
     echo "Home Assistant Supervised installation complete."
-    sleep 10
-    homeassistant
+    sleep 5
+    echo "System is restarting..."
+    sleep 5
+    systemctl reboot
 }
 
 homeassistant_uninstall() {
