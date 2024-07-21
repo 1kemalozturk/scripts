@@ -569,7 +569,18 @@ homeassistant_install() {
                 systemd-journal-remote \
                 udisks2 \
                 wget \
+                equivs \
                 unzip
+            
+            # Or you can create a fake systemd-resolved package using equivs which will satisfy the missing dependency.
+            # Generate a template control file
+            equivs-control systemd-resolved.control
+            # Fix the package name
+            sed -i 's/<package name; defaults to equivs-dummy>/systemd-resolved/g' systemd-resolved.control
+            # Build the package
+            equivs-build systemd-resolved.control
+            # Install it
+            dpkg -i systemd-resolved_1.0_all.deb
 
             # Install Docker
             curl -fsSL get.docker.com | sh
@@ -603,12 +614,10 @@ homeassistant_install() {
 
 homeassistant_install_supervised() {
     apt install -y ./os-agent_linux_x86_64.deb
-    systemctl enable haos-agent
-    systemctl start haos-agent
 
     sleep 3
 
-    BYPASS_OS_CHECK=true dpkg -i --ignore-depends=systemd-resolved ./homeassistant-supervised.deb
+    dpkg -i --ignore-depends=systemd-resolved homeassistant-supervised.deb
     wget -O - https://get.hacs.xyz | bash -
 
     rm -fr os-agent_linux_x86_64.deb homeassistant-supervised.deb "$HOMEASSISTANT_INSTALL_SUPERVISED"
