@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # OS and Kernel information
-OS_INFO=$(lsb_release -d | awk -F"\t" '{print $2}')
+OS_INFO=$(lsb_release -d | awk -F"t" '{print $2}')
 KERNEL_INFO=$(uname -r)
 
 # System time
@@ -28,8 +28,7 @@ PROCESSES=$(ps aux --no-heading | wc -l)
 USERS=$(who | wc -l)
 
 # Network information
-IPV4_ADDRESS=$(ip -4 addr show eth0 | grep -oP '(?<=inet\s)\d+(\.\d+){3}')
-
+IPV4_ADDRESS=$(ip -4 addr show eth0 | grep -oP '(?<=inets)d (.d ){3}')
 
 show_main() {
     clear
@@ -58,14 +57,18 @@ show_main() {
     echo -n "Choose an option: "
     read choice
     case $choice in
-        1) developer_tools ;;
-        2) networking ;;
-        3) home_automation ;;
-        4) ai ;;
-        5) tools ;;
-        6) troubleshooting ;;
-        0) exit 0 ;;
-        *) echo "Invalid option!"; sleep 1; show_main ;;
+    1) developer_tools ;;
+    2) networking ;;
+    3) home_automation ;;
+    4) ai ;;
+    5) tools ;;
+    6) troubleshooting ;;
+    0) exit 0 ;;
+    *)
+        echo "Invalid option!"
+        sleep 1
+        show_main
+        ;;
     esac
 }
 
@@ -77,13 +80,13 @@ check_for_updates() {
 
     # URL of the raw script from the GitHub repository
     script_url="https://raw.githubusercontent.com/1kemalozturk/scripts/main/linux/oneclick.sh"
-    
+
     # Temp file to store the updated script
     temp_script="/tmp/updated_script.sh"
 
     # Fetch the latest version of the script
     curl -s -o "$temp_script" "$script_url"
-    
+
     # Check if the temp file was created successfully
     if [[ ! -f "$temp_script" ]]; then
         echo "Failed to download the update."
@@ -99,7 +102,7 @@ check_for_updates() {
     if [[ "$local_hash" != "$updated_hash" ]]; then
         echo "Update found. Applying update..."
         cp "$temp_script" "$0"
-        chmod +x "$0"
+        chmod x "$0"
         sleep 1.5
         clear
         echo "Script updated. Please re-run the script."
@@ -122,9 +125,13 @@ developer_tools() {
     echo -n "Choose an option: "
     read choice
     case $choice in
-        1) usbip ;;
-        0) show_main ;;
-        *) echo "Invalid option!"; sleep 1; developer_tools ;;
+    1) usbip ;;
+    0) show_main ;;
+    *)
+        echo "Invalid option!"
+        sleep 1
+        developer_tools
+        ;;
     esac
 }
 
@@ -138,11 +145,15 @@ networking() {
     echo -n "Choose an option: "
     read choice
     case $choice in
-        1) 3x-ui ;;
-        2) adguardhome ;;
-        3) pi-hole ;;
-        0) show_main ;;
-        *) echo "Invalid option!"; sleep 1; networking ;;
+    1) 3x-ui ;;
+    2) adguardhome ;;
+    3) pi-hole ;;
+    0) show_main ;;
+    *)
+        echo "Invalid option!"
+        sleep 1
+        networking
+        ;;
     esac
 }
 
@@ -154,9 +165,13 @@ home_automation() {
     echo -n "Choose an option: "
     read choice
     case $choice in
-        1) homeassistant ;;
-        0) show_main ;;
-        *) echo "Invalid option!"; sleep 1; home_automation ;;
+    1) homeassistant ;;
+    0) show_main ;;
+    *)
+        echo "Invalid option!"
+        sleep 1
+        home_automation
+        ;;
     esac
 }
 
@@ -170,11 +185,15 @@ usbip() {
     echo -n "Choose an option: "
     read choice
     case $choice in
-        1) usbip_install ;;
-        2) usbip_uninstall ;;
-        3) usbip_managment ;;
-        0) show_main ;;
-        *) echo "Invalid option!"; sleep 1; usbip ;;
+    1) usbip_install ;;
+    2) usbip_uninstall ;;
+    3) usbip_managment ;;
+    0) show_main ;;
+    *)
+        echo "Invalid option!"
+        sleep 1
+        usbip
+        ;;
     esac
 }
 
@@ -188,11 +207,15 @@ usbip_managment() {
     echo -n "Choose an option: "
     read choice
     case $choice in
-        1) usbip_attach_service_install ;;
-        2) usbip_attach_service_uninstall ;;
-        3) usbip_attach_service_status ;;
-        0) show_main ;;
-        *) echo "Invalid option!"; sleep 1; usbip_managment ;;
+    1) usbip_attach_service_install ;;
+    2) usbip_attach_service_uninstall ;;
+    3) usbip_attach_service_status ;;
+    0) show_main ;;
+    *)
+        echo "Invalid option!"
+        sleep 1
+        usbip_managment
+        ;;
     esac
 }
 
@@ -206,30 +229,30 @@ usbip_install() {
     read choice
 
     case $choice in
-        1)
-            echo "Installing Usbip on Ubuntu..."
-            apt update
-            apt install -y hwdata usbutils linux-tools-virtual
-            update-alternatives --install /usr/local/bin/usbip usbip $(ls /usr/lib/linux-tools/*/usbip | tail -n1) 20
-            modprobe vhci-hcd
-            echo "Usbip installed on Ubuntu."
-            ;;
-        2)
-            echo "Installing Usbip on Debian..."
-            apt update
-            apt install -y hwdata usbutils usbip
-            echo "Usbip installed on Debian."
-            ;;
-        0)
-            show_main
-            return
-            ;;
-        *)
-            echo "Invalid option!"
-            sleep 1
-            usbip_install
-            return
-            ;;
+    1)
+        echo "Installing Usbip on Ubuntu..."
+        apt update
+        apt install -y hwdata usbutils linux-tools-virtual
+        update-alternatives --install /usr/local/bin/usbip usbip $(ls /usr/lib/linux-tools/*/usbip | tail -n1) 20
+        modprobe vhci-hcd
+        echo "Usbip installed on Ubuntu."
+        ;;
+    2)
+        echo "Installing Usbip on Debian..."
+        apt update
+        apt install -y hwdata usbutils usbip
+        echo "Usbip installed on Debian."
+        ;;
+    0)
+        show_main
+        return
+        ;;
+    *)
+        echo "Invalid option!"
+        sleep 1
+        usbip_install
+        return
+        ;;
     esac
     sleep 10
     usbip
@@ -245,28 +268,28 @@ usbip_uninstall() {
     read choice
 
     case $choice in
-        1)
-            echo "Uninstalling Usbip on Ubuntu..."
-            apt remove -y hwdata usbutils linux-tools-virtual
-            apt autoremove -y
-            echo "Usbip uninstalled on Ubuntu."
-            ;;
-        2)
-            echo "Uninstalling Usbip on Debian..."
-            apt remove -y hwdata usbutils usbip
-            apt autoremove -y
-            echo "Usbip uninstalled on Debian."
-            ;;
-        0)
-            show_main
-            return
-            ;;
-        *)
-            echo "Invalid option!"
-            sleep 1
-            usbip_install
-            return
-            ;;
+    1)
+        echo "Uninstalling Usbip on Ubuntu..."
+        apt remove -y hwdata usbutils linux-tools-virtual
+        apt autoremove -y
+        echo "Usbip uninstalled on Ubuntu."
+        ;;
+    2)
+        echo "Uninstalling Usbip on Debian..."
+        apt remove -y hwdata usbutils usbip
+        apt autoremove -y
+        echo "Usbip uninstalled on Debian."
+        ;;
+    0)
+        show_main
+        return
+        ;;
+    *)
+        echo "Invalid option!"
+        sleep 1
+        usbip_install
+        return
+        ;;
     esac
     sleep 10
     usbip
@@ -319,7 +342,7 @@ ExecStart=$script_file
 Restart=on-failure
 
 [Install]
-WantedBy=multi-user.target" | tee $service_file > /dev/null
+WantedBy=multi-user.target" | tee $service_file >/dev/null
 
     # Check if the service file was created successfully
     if [[ $? -ne 0 ]]; then
@@ -336,7 +359,7 @@ WantedBy=multi-user.target" | tee $service_file > /dev/null
 modprobe vhci-hcd
 
 # Attach USB device
-usbip attach -r \"$host_ip\" -b \"$bus_id\"" | tee $script_file > /dev/null
+usbip attach -r "$host_ip" -b "$bus_id"" | tee $script_file >/dev/null
 
     # Check if the script file was created successfully
     if [[ $? -ne 0 ]]; then
@@ -347,7 +370,7 @@ usbip attach -r \"$host_ip\" -b \"$bus_id\"" | tee $script_file > /dev/null
     fi
 
     # Make the script executable
-    chmod +x $script_file
+    chmod x $script_file
 
     # Reload systemd, enable, and start the service
     systemctl daemon-reload
@@ -404,10 +427,14 @@ usbip_attach_service_status() {
     echo -n "Choose an option: "
     read choice
     case $choice in
-        1) 3x-ui_install ;;
-        2) 3x-ui_management ;;
-        0) show_main ;;
-        *) echo "Invalid option!"; sleep 1; 3x-ui ;;
+    1) 3x-ui_install ;;
+    2) 3x-ui_management ;;
+    0) show_main ;;
+    *)
+        echo "Invalid option!"
+        sleep 1
+        3x-ui
+        ;;
     esac
 }
 
@@ -436,10 +463,14 @@ adguardhome() {
     echo -n "Choose an option: "
     read choice
     case $choice in
-        1) adguardhome_install ;;
-        2) adguardhome_uninstall ;;
-        0) show_main ;;
-        *) echo "Invalid option!"; sleep 1; adguardhome ;;
+    1) adguardhome_install ;;
+    2) adguardhome_uninstall ;;
+    0) show_main ;;
+    *)
+        echo "Invalid option!"
+        sleep 1
+        adguardhome
+        ;;
     esac
 }
 
@@ -474,10 +505,14 @@ pi-hole() {
     echo -n "Choose an option: "
     read choice
     case $choice in
-        1) pi-hole_install ;;
-        2) pi-hole_uninstall ;;
-        0) show_main ;;
-        *) echo "Invalid option!"; sleep 1; pi-hole ;;
+    1) pi-hole_install ;;
+    2) pi-hole_uninstall ;;
+    0) show_main ;;
+    *)
+        echo "Invalid option!"
+        sleep 1
+        pi-hole
+        ;;
     esac
 }
 
@@ -508,24 +543,21 @@ homeassistant() {
     echo -n "Choose an option: "
     read choice
     case $choice in
-        1) homeassistant_install ;;
-        2) homeassistant_uninstall ;;
-        0) show_main ;;
-        *) echo "Invalid option!"; sleep 1; homeassistant ;;
+    1) homeassistant_install ;;
+    2) homeassistant_uninstall ;;
+    0) show_main ;;
+    *)
+        echo "Invalid option!"
+        sleep 1
+        homeassistant
+        ;;
     esac
 }
 
 # Flag file to check the stage of the installation
-HOMEASSISTANT_INSTALL_CONTAINER="homeassistant_install_container"
 HOMEASSISTANT_INSTALL_SUPERVISED="homeassistant_install_supervised"
 
 # Function to check the flag file and continue installation if necessary
-homeassistant_install_container_check() {
-    if [ -f "$HOMEASSISTANT_INSTALL_CONTAINER" ]; then
-        homeassistant_install_container
-        exit 0
-    fi
-}
 homeassistant_install_supervised_check() {
     if [ -f "$HOMEASSISTANT_INSTALL_SUPERVISED" ]; then
         homeassistant_install_supervised
@@ -534,138 +566,101 @@ homeassistant_install_supervised_check() {
 }
 
 homeassistant_install() {
-    clear
-    echo "Home Assistant Installation"
-    echo "1. Home Assistant Container"
-    echo "2. Home Assistant Supervised (Debian Only)"
-    echo "0. Back"
-    echo -n "Choose an option: "
-    read choice
+    echo "Starting Home Assistant Supervised installation..."
 
-    case $choice in
-        1)
-            clear
-            echo "Starting Home Assistant Container installation..."
+    apt update && sudo apt upgrade -y && sudo apt autoremove -y
+    apt --fix-broken install
+    apt install -y
+    apparmor
+    cifs-utils
+    curl
+    dbus
+    jq
+    libglib2.0-bin
+    lsb-release
+    network-manager
+    nfs-common
+    systemd-journal-remote
+    systemd-resolved
+    udisks2
+    wget
 
-            echo "Home Assistant Container installation complete."
-            sleep 5
-            ;;
-        2)
-            clear
-            echo "Starting Home Assistant Supervised installation..."
+    # Update /etc/systemd/resolved.conf
+    echo "Updating /etc/systemd/resolved.conf with disabling DNSStubListener..."
 
-            apt update && sudo apt upgrade -y && sudo apt autoremove -y
-            apt --fix-broken install
-            apt install -y \
-                apparmor \
-                cifs-utils \
-                curl \
-                dbus \
-                jq \
-                libglib2.0-bin \
-                lsb-release \
-                network-manager \
-                nfs-common \
-                systemd-journal-remote \
-                systemd-resolved \
-                udisks2 \
-                wget
-            
-            # Define the DNS server address
-            DNS_SERVER="192.168.1.1"
+    # Use 'sed' to uncomment and set the DNSStubListener options
+    sed -i 's/^#DNSStubListener=.*/DNSStubListener=no/g' /etc/systemd/resolved.conf
 
-            # Update /etc/systemd/resolved.conf
-            echo "Updating /etc/systemd/resolved.conf with DNS server and disabling DNSStubListener..."
+    # Restart systemd-resolved service
+    echo "Restarting systemd-resolved service..."
+    sudo systemctl restart systemd-resolved
 
-            # Use 'sed' to uncomment and set the DNS and DNSStubListener options
-            sed -i 's/^#DNS=.*/DNS='"$DNS_SERVER"'/g' /etc/systemd/resolved.conf
-            sed -i 's/^#DNSStubListener=.*/DNSStubListener=no/g' /etc/systemd/resolved.conf
+    # Check the status of name resolution
+    echo "Checking name resolution..."
+    if ping -c 1 google.com &>/dev/null; then
+        echo "Name resolution is working."
+    else
+        echo "Name resolution is not working. Please check your DNS configuration."
+    fi
 
-            # Restart systemd-resolved service
-            echo "Restarting systemd-resolved service..."
-            sudo systemctl restart systemd-resolved
+    # Install Docker
+    if [ -x "$(command -v docker)" ]; then
+        print_info "Docker is already installed."
+    else
+        print_info "Docker is being installed..."
+        curl -fsSL get.docker.com -o get-docker.sh && sh get-docker.sh
 
-            # Check the status of name resolution
-            echo "Checking name resolution..."
-            if ping -c 1 google.com &> /dev/null; then
-                echo "Name resolution is working."
-            else
-                echo "Name resolution is not working. Please check your DNS configuration."
-            fi
+        if [[ -n "${SUDO_USER}" ]]; then
+            usermod -aG docker "$SUDO_USER"
+        fi
+        rm -f get-docker.sh
+        print_info "Docker installed."
+    fi
 
+    # Download and install Home Assistant packages
+    wget -O os-agent_linux_x86_64.deb https://github.com/home-assistant/os-agent/releases/latest/download/os-agent_1.6.0_linux_x86_64.deb
+    wget -O homeassistant-supervised.deb https://github.com/home-assistant/supervised-installer/releases/latest/download/homeassistant-supervised.deb
 
-            # Install Docker
-            if [ -x "$(command -v docker)" ]; then
-                print_info "Docker is already installed."
-            else
-                print_info "Docker is being installed..."
-                curl -fsSL get.docker.com -o get-docker.sh && sh get-docker.sh
+    chmod 777 os-agent_linux_x86_64.deb homeassistant-supervised.deb
 
-                if [[ -n "${SUDO_USER}" ]] ; then 
-                usermod -aG docker "$SUDO_USER"
-                fi
-                rm -f get-docker.sh
-                print_info "Docker installed."
-            fi
+    echo "supervised" >"$HOMEASSISTANT_INSTALL_SUPERVISED"
 
-            # Download and install Home Assistant packages
-            wget -O os-agent_linux_x86_64.deb https://github.com/home-assistant/os-agent/releases/latest/download/os-agent_1.6.0_linux_x86_64.deb
-            wget -O homeassistant-supervised.deb https://github.com/home-assistant/supervised-installer/releases/latest/download/homeassistant-supervised.deb
-
-            chmod +x os-agent_linux_x86_64.deb homeassistant-supervised.deb
-            apt install -y ./os-agent_linux_x86_64.deb
-
-            echo "supervised" > "$HOMEASSISTANT_INSTALL_SUPERVISED"
-
-            echo "System is restarting..."
-            sleep 5
-            systemctl reboot
-            ;;
-        0)
-            homeassistant
-            return
-            ;;
-        *)
-            echo "Invalid option!"
-            sleep 1
-            homeassistant_install
-            return
-            ;;
-    esac
+    echo "System is restarting..."
     sleep 5
-    homeassistant
+    systemctl reboot
 }
 
 homeassistant_install_supervised() {
+    apt install -y ./os-agent_linux_x86_64.deb
     dpkg -i --ignore-depends=systemd-resolved homeassistant-supervised.deb
 
     apt remove -y systemd-resolved
     rm -fr os-agent_linux_x86_64.deb homeassistant-supervised.deb "$HOMEASSISTANT_INSTALL_SUPERVISED"
     echo "Home Assistant Supervised installation complete."
     sleep 5
-    homeassistant
+    systemctl reboot
 }
 
 homeassistant_uninstall() {
     clear
     echo "Uninstalling Home Assistant..."
 
-    systemctl stop haos-agent > /dev/null 2>&1
-    systemctl stop hassio-apparmor > /dev/null 2>&1
-    systemctl stop hassio-supervisor > /dev/null 2>&1
-    apt-get purge -y homeassistant-supervised\* > /dev/null 2>&1 || true
-    dpkg -r homeassistant-supervised > /dev/null 2>&1 || true
-    dpkg -r os-agent > /dev/null 2>&1
-    docker ps --format json|jq -r .Names | grep -E 'addon_|hassio_|homeassistant' | xargs -n 1 docker stop || true
+    systemctl stop haos-agent >/dev/null 2>&1
+    systemctl stop hassio-apparmor >/dev/null 2>&1
+    systemctl stop hassio-supervisor >/dev/null 2>&1
+    apt-get purge -y homeassistant-supervised* >/dev/null 2>&1 || true
+    dpkg -r homeassistant-supervised >/dev/null 2>&1 || true
+    dpkg -r os-agent >/dev/null 2>&1
+    docker ps --format json | jq -r .Names | grep -E 'addon_|hassio_|homeassistant' | xargs -n 1 docker stop || true
     sleep 1
-    if [ -n "$(docker ps --format json|jq -r .Names | grep -E 'addon_|hassio_|homeassistant')" ]; then
+    if [ -n "$(docker ps --format json | jq -r .Names | grep -E 'addon_|hassio_|homeassistant')" ]; then
         print_info "Containers are expected to stop..."
-        docker ps --format json|jq -r .Names | grep -E 'addon_|hassio_|homeassistant' | xargs -n 1 docker stop  || true
+        docker ps --format json | jq -r .Names | grep -E 'addon_|hassio_|homeassistant' | xargs -n 1 docker stop || true
         sleep 5
     fi
     sleep 5
-    docker system prune -a -f > /dev/null 2>&1
-    docker system prune -a -f > /dev/null 2>&1
+    docker system prune -a -f >/dev/null 2>&1
+    docker system prune -a -f >/dev/null 2>&1
 
     echo "Home Assistant uninstalled."
     sleep 5
@@ -685,10 +680,14 @@ ai() {
     echo -n "Choose an option: "
     read choice
     case $choice in
-        1) ollama ;;
-        2) open-webui ;;
-        0) show_main ;;
-        *) echo "Invalid option!"; sleep 1; ai ;;
+    1) ollama ;;
+    2) open-webui ;;
+    0) show_main ;;
+    *)
+        echo "Invalid option!"
+        sleep 1
+        ai
+        ;;
     esac
 }
 
@@ -701,10 +700,14 @@ ollama() {
     echo -n "Choose an option: "
     read choice
     case $choice in
-        1) ollama_install ;;
-        2) ollama_uninstall ;;
-        0) show_main ;;
-        *) echo "Invalid option!"; sleep 1; ollama ;;
+    1) ollama_install ;;
+    2) ollama_uninstall ;;
+    0) show_main ;;
+    *)
+        echo "Invalid option!"
+        sleep 1
+        ollama
+        ;;
     esac
     sleep 10
     ollama
@@ -750,10 +753,14 @@ open-webui() {
     echo -n "Choose an option: "
     read choice
     case $choice in
-        1) open-webui_install ;;
-        2) open-webui_uninstall ;;
-        0) show_main ;;
-        *) echo "Invalid option!"; sleep 1; open-webui ;;
+    1) open-webui_install ;;
+    2) open-webui_uninstall ;;
+    0) show_main ;;
+    *)
+        echo "Invalid option!"
+        sleep 1
+        open-webui
+        ;;
     esac
     sleep 10
     open-webui
@@ -781,9 +788,13 @@ tools() {
     echo -n "Choose an option: "
     read choice
     case $choice in
-        1) tools_checkPort ;;
-        0) show_main ;;
-        *) echo "Invalid option!"; sleep 1; tools ;;
+    1) tools_checkPort ;;
+    0) show_main ;;
+    *)
+        echo "Invalid option!"
+        sleep 1
+        tools
+        ;;
     esac
 }
 
@@ -805,10 +816,14 @@ troubleshooting() {
     echo -n "Choose an option: "
     read choice
     case $choice in
-        1) troubleshooting_monitor_uninstall ;;
-        2) troubleshooting_dpkg_repair ;;
-        0) show_main ;;
-        *) echo "Invalid option!"; sleep 1; troubleshooting ;;
+    1) troubleshooting_monitor_uninstall ;;
+    2) troubleshooting_dpkg_repair ;;
+    0) show_main ;;
+    *)
+        echo "Invalid option!"
+        sleep 1
+        troubleshooting
+        ;;
     esac
 }
 
@@ -835,6 +850,5 @@ troubleshooting_dpkg_repair() {
 }
 
 check_for_updates
-homeassistant_install_container_check
 homeassistant_install_supervised_check
 show_main
