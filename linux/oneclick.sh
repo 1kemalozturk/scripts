@@ -625,9 +625,11 @@ homeassistant_install() {
         # Use 'sed' to uncomment and set the DNSStubListener options
         sed -i 's/^#DNSStubListener=.*/DNSStubListener=no/g' /etc/systemd/resolved.conf
 
-        # Restart systemd-resolved service
-        echo "Restarting systemd-resolved service..."
-        sudo systemctl restart systemd-resolved
+        # Restart network service
+        echo "Restarting network service..."
+        systemctl restart systemd-resolved
+        systemctl restart systemd-networkd.service
+        systemctl restart NetworkManager
         sleep 5
         homeassistant_install
     fi
@@ -657,9 +659,11 @@ homeassistant_install_supervised() {
         # Use 'sed' to uncomment and set the DNSStubListener options
         sed -i 's/^#DNSStubListener=.*/DNSStubListener=no/g' /etc/systemd/resolved.conf
 
-        # Restart systemd-resolved service
-        echo "Restarting systemd-resolved service..."
-        sudo systemctl restart systemd-resolved
+        # Restart network service
+        echo "Restarting network service..."
+        systemctl restart systemd-resolved
+        systemctl restart systemd-networkd.service
+        systemctl restart NetworkManager
         sleep 5
         homeassistant_install_supervised
     fi
