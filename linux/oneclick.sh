@@ -569,8 +569,7 @@ homeassistant_install() {
                 systemd-journal-remote \
                 systemd-resolved \
                 udisks2 \
-                wget \
-                unzip
+                wget
             
             # Define the DNS server address
             DNS_SERVER="192.168.1.1"
@@ -614,10 +613,11 @@ homeassistant_install() {
             wget -O homeassistant-supervised.deb https://github.com/home-assistant/supervised-installer/releases/latest/download/homeassistant-supervised.deb
 
             chmod +x os-agent_linux_x86_64.deb homeassistant-supervised.deb
+            apt install -y ./os-agent_linux_x86_64.deb
 
             echo "supervised" > "$HOMEASSISTANT_INSTALL_SUPERVISED"
 
-            echo "System will reboot now."
+            echo "System is restarting..."
             sleep 5
             systemctl reboot
             ;;
@@ -637,17 +637,13 @@ homeassistant_install() {
 }
 
 homeassistant_install_supervised() {
-    apt install -y ./os-agent_linux_x86_64.deb
     dpkg -i --ignore-depends=systemd-resolved homeassistant-supervised.deb
-    wget -O - https://get.hacs.xyz | bash -
 
     apt remove -y systemd-resolved
     rm -fr os-agent_linux_x86_64.deb homeassistant-supervised.deb "$HOMEASSISTANT_INSTALL_SUPERVISED"
     echo "Home Assistant Supervised installation complete."
     sleep 5
-    echo "System is restarting..."
-    sleep 5
-    systemctl reboot
+    homeassistant
 }
 
 homeassistant_uninstall() {
@@ -659,13 +655,12 @@ homeassistant_uninstall() {
     systemctl stop hassio-supervisor > /dev/null 2>&1
     apt-get purge -y homeassistant-supervised\* > /dev/null 2>&1 || true
     dpkg -r homeassistant-supervised > /dev/null 2>&1 || true
-    dpkg -r homeassistant-supervised-jethome > /dev/null 2>&1 || true
     dpkg -r os-agent > /dev/null 2>&1
-    docker ps --format json|jq -r .Names | grep -E 'addon_|hassio_' | xargs -n 1 docker stop || true
+    docker ps --format json|jq -r .Names | grep -E 'addon_|hassio_|homeassistant' | xargs -n 1 docker stop || true
     sleep 1
-    if [ -n "$(docker ps --format json|jq -r .Names | grep -E 'addon_|hassio_')" ]; then
-        print_info "Konteynerlerin durması bekleniyor"
-        docker ps --format json|jq -r .Names | grep -E 'addon_|hassio_' | xargs -n 1 docker stop  || true
+    if [ -n "$(docker ps --format json|jq -r .Names | grep -E 'addon_|hassio_|homeassistant')" ]; then
+        print_info "Containers are expected to stop..."
+        docker ps --format json|jq -r .Names | grep -E 'addon_|hassio_|homeassistant' | xargs -n 1 docker stop  || true
         sleep 5
     fi
     sleep 5
@@ -675,6 +670,10 @@ homeassistant_uninstall() {
     echo "Home Assistant uninstalled."
     sleep 5
     homeassistant
+}
+
+homeassistant_hacs() {
+    wget -O - https://get.hacs.xyz | bash -
 }
 
 ai() {
