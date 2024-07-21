@@ -571,27 +571,26 @@ homeassistant_install() {
     clear
     echo "Starting Home Assistant Supervised installation..."
 
-    apt update && sudo apt upgrade -y && sudo apt autoremove -y
-    apt install \
-    apparmor \
-    bluez \
-    cifs-utils \
-    curl \
-    dbus \
-    jq \
-    libglib2.0-bin \
-    lsb-release \
-    network-manager \
-    nfs-common \
-    systemd-journal-remote \
-    systemd-resolved \
-    udisks2 \
-    wget -y
-
     # Check the status of name resolution
     echo "Checking name resolution..."
     if ping -c 1 checkonline.home-assistant.io &>/dev/null; then
         echo "Name resolution is working."
+        apt update && sudo apt upgrade -y && sudo apt autoremove -y
+        apt install \
+        apparmor \
+        bluez \
+        cifs-utils \
+        curl \
+        dbus \
+        jq \
+        libglib2.0-bin \
+        lsb-release \
+        network-manager \
+        nfs-common \
+        systemd-journal-remote \
+        systemd-resolved \
+        udisks2 \
+        wget -y
         
         # Install Docker
         if [ -x "$(command -v docker)" ]; then
@@ -827,6 +826,29 @@ tools() {
         tools
         ;;
     esac
+}
+
+tools_netstat() {
+    clear
+    if [ -x "$(command -v netstat)" ]; then
+        netstat -tulpn
+    else
+        apt install -y netstat
+        tools_netstat
+    fi
+}
+
+tools_speedtest() {
+    clear
+    if [ -x "$(command -v speedtest)" ]; then
+        speedtest
+    else
+        apt-get install -y curl
+        curl -s https://packagecloud.io/install/repositories/ookla/speedtest-cli/script.deb.sh | sudo bash
+        apt-get install -y speedtest
+        tools_speedtest
+    fi
+
 }
 
 troubleshooting() {
