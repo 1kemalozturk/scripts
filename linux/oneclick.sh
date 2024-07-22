@@ -680,8 +680,6 @@ homeassistant_uninstall() {
         docker ps --format json | jq -r .Names | grep -E 'addon_|hassio_|homeassistant' | xargs -n 1 docker stop || true
         sleep 5
     fi
-    sleep 5
-    docker system prune -a -f >/dev/null 2>&1
 
     echo "Home Assistant uninstalled."
     sleep 5
