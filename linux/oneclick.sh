@@ -594,16 +594,10 @@ homeassistant_install() {
         
         # Install Docker
         if [ -x "$(command -v docker)" ]; then
-            print_info "Docker is already installed."
+            echo "Docker is already installed."
         else
-            print_info "Docker is being installed..."
-            curl -fsSL get.docker.com -o get-docker.sh && sh get-docker.sh
-
-            if [[ -n "${SUDO_USER}" ]]; then
-                usermod -aG docker "$SUDO_USER"
-            fi
-            rm -f get-docker.sh
-            print_info "Docker installed."
+            curl -fsSL get.docker.com | sh
+            echo "Docker installed."
         fi
 
         # Download and install Home Assistant packages
