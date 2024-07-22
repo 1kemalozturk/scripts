@@ -637,10 +637,23 @@ homeassistant_install_supervised() {
         apt install -y ./os-agent_linux_x86_64.deb
         BYPASS_OS_CHECK=true dpkg -i --ignore-depends=systemd-resolved homeassistant-supervised.deb
 
-        apt install -y bluez
+        apt update && sudo apt upgrade -y && sudo apt autoremove -y
+        apt install \
+        apparmor \
+        bluez \
+        cifs-utils \
+        curl \
+        dbus \
+        jq \
+        libglib2.0-bin \
+        lsb-release \
+        network-manager \
+        nfs-common \
+        systemd-journal-remote \
+        systemd-resolved \
+        udisks2 \
+        wget -y
         apt --fix-broken install
-
-        BYPASS_OS_CHECK=true dpkg -i --ignore-depends=systemd-resolved homeassistant-supervised.deb
 
         rm -fr os-agent_linux_x86_64.deb homeassistant-supervised.deb "$HOMEASSISTANT_INSTALL"
         echo "Home Assistant Supervised installation complete."
