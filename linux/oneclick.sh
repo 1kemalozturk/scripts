@@ -656,6 +656,21 @@ homeassistant_install_supervised() {
         apt --fix-broken install
 
         rm -fr os-agent_linux_x86_64.deb homeassistant-supervised.deb "$HOMEASSISTANT_INSTALL"
+
+        echo "Home Assistant Hacs services installation..."
+        sleep 30
+        if [ -n "$(docker ps --format json | jq -r .Names | grep -E 'homeassistant')" ]; then
+        echo "Home Assistant containers are expected to start..."
+        wget -O - https://get.hacs.xyz | bash -
+        fi
+
+        # getumbrel Services
+        if [ -n "$(docker ps --format json | jq -r .Names | grep -E 'tor_proxy')" ]; then
+            echo "UmbrelOS containers are expected to start..."
+            docker ps --format json | jq -r .Names | grep -E 'tor_proxy' | xargs -n 1 docker start || true
+            sleep 5
+        fi
+
         echo "Home Assistant Supervised installation complete."
         sleep 5
         homeassistant
@@ -691,20 +706,20 @@ homeassistant_uninstall() {
     docker ps --format json | jq -r .Names | grep -E 'addon_|hassio_|homeassistant' | xargs -n 1 docker stop || true
     sleep 1
     if [ -n "$(docker ps --format json | jq -r .Names | grep -E 'addon_|hassio_|homeassistant')" ]; then
-        print_info "Containers are expected to stop..."
+        echo "Home Assistant containers are expected to stop..."
         docker ps --format json | jq -r .Names | grep -E 'addon_|hassio_|homeassistant' | xargs -n 1 docker stop || true
+        sleep 5
+    fi
+
+    # getumbrel Services
+    if [ -n "$(docker ps --format json | jq -r .Names | grep -E 'tor_proxy')" ]; then
+        echo "UmbrelOS containers are expected to start..."
+        docker ps --format json | jq -r .Names | grep -E 'tor_proxy' | xargs -n 1 docker start || true
         sleep 5
     fi
 
     echo "Home Assistant uninstalled."
     sleep 5
-    homeassistant
-}
-
-homeassistant_hacs() {
-    clear
-    wget -O - https://get.hacs.xyz | bash -
-    sleep 10
     homeassistant
 }
 
