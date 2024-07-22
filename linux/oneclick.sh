@@ -649,7 +649,7 @@ homeassistant_install_supervised() {
         fi
 
         # getumbrel Services
-        if [ -n "$(docker ps --format json | jq -r .Image | grep -E 'getumbrel/auth-server|getumbrel/tor')" ]; then
+        if [ -n "$(docker ps --format json | jq -r .Names | grep -E 'auth|tor_proxy')" ]; then
             if [ -n "$(docker ps --format json | jq -r .Names | grep -E 'gifted_almeida')" ]; then
             echo "Container gifted_almeida is already running."
             else
