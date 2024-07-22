@@ -837,8 +837,13 @@ tools_netstat() {
     if [ -x "$(command -v netstat)" ]; then
         netstat -tulpn
     else
-        apt install -y netstat
-        tools_netstat
+        apt update && apt install -y net-tools
+        if [ -x "$(command -v netstat)" ]; then
+            tools_netstat
+        else
+            echo "Failed to install netstat."
+            exit 1
+        }
     fi
 }
 
@@ -847,12 +852,23 @@ tools_speedtest() {
     if [ -x "$(command -v speedtest)" ]; then
         speedtest
     else
-        apt-get install -y curl
+        # Ensure curl is installed
+        if ! [ -x "$(command -v curl)" ]; then
+            apt install -y curl
+        fi
+        
+        # Install speedtest
         curl -s https://packagecloud.io/install/repositories/ookla/speedtest-cli/script.deb.sh | sudo bash
-        apt-get install -y speedtest
-        tools_speedtest
+        apt install -y speedtest
+        
+        # Check if speedtest was installed successfully before re-invoking the function
+        if [ -x "$(command -v speedtest)" ]; then
+            tools_speedtest
+        else
+            echo "Failed to install speedtest."
+            exit 1
+        fi
     fi
-
 }
 
 troubleshooting() {
