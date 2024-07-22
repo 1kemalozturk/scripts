@@ -663,7 +663,10 @@ homeassistant_install_supervised() {
         fi
 
         # getumbrel Services
-        docker start tor_proxy
+        if [ -n "$(docker ps --format json | jq -r .Names | grep -E 'gifted_almeida')" ]; then
+        else
+        docker start gifted_almeida
+        fi
 
         echo "Home Assistant Supervised installation complete."
         sleep 5
