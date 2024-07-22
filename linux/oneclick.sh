@@ -663,11 +663,7 @@ homeassistant_install_supervised() {
         fi
 
         # getumbrel Services
-        if [ -n "$(docker ps --format json | jq -r .Names | grep -E 'tor_proxy')" ]; then
-            echo "UmbrelOS containers are expected to start..."
-            docker ps --format json | jq -r .Names | grep -E 'tor_proxy' | xargs -n 1 docker start || true
-            sleep 5
-        fi
+        docker start tor_proxy
 
         echo "Home Assistant Supervised installation complete."
         sleep 5
