@@ -711,13 +711,6 @@ homeassistant_uninstall() {
         sleep 5
     fi
 
-    # getumbrel Services
-    if [ -n "$(docker ps --format json | jq -r .Names | grep -E 'tor_proxy')" ]; then
-        echo "UmbrelOS containers are expected to start..."
-        docker ps --format json | jq -r .Names | grep -E 'tor_proxy' | xargs -n 1 docker start || true
-        sleep 5
-    fi
-
     echo "Home Assistant uninstalled."
     sleep 5
     homeassistant
