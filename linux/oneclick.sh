@@ -843,7 +843,7 @@ tools_netstat() {
         else
             echo "Failed to install netstat."
             exit 1
-        }
+        fi
     fi
 }
 
