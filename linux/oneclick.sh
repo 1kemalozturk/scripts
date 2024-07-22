@@ -575,29 +575,26 @@ homeassistant_install() {
     echo "Checking name resolution..."
     if ping -c 1 checkonline.home-assistant.io &>/dev/null; then
         echo "Name resolution is working."
-        apt update && sudo apt upgrade -y && sudo apt autoremove -y
-        apt install \
-        apparmor \
-        bluez \
-        cifs-utils \
-        curl \
-        dbus \
-        jq \
-        libglib2.0-bin \
-        lsb-release \
-        network-manager \
-        nfs-common \
-        systemd-journal-remote \
-        systemd-resolved \
-        udisks2 \
-        wget -y
-        
-        # Install Docker
         if [ -x "$(command -v docker)" ]; then
-            echo "Docker is already installed."
+            apt update && sudo apt upgrade -y && sudo apt autoremove -y
+            apt install \
+            apparmor \
+            bluez \
+            cifs-utils \
+            curl \
+            dbus \
+            jq \
+            libglib2.0-bin \
+            lsb-release \
+            network-manager \
+            nfs-common \
+            systemd-journal-remote \
+            systemd-resolved \
+            udisks2 \
+            wget -y
         else
             curl -fsSL get.docker.com | sh
-            echo "Docker installed."
+            homeassistant_install
         fi
 
         echo "supervised" >"$HOMEASSISTANT_INSTALL"
