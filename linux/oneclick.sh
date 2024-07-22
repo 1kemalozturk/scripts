@@ -650,11 +650,15 @@ homeassistant_install_supervised() {
 
         # getumbrel Services
         if [ -n "$(docker ps --format json | jq -r .Names | grep -E 'auth|tor_proxy')" ]; then
-            if [ -n "$(docker ps --format json | jq -r .Names | grep -E 'gifted_almeida')" ]; then
-                echo "Container gifted_almeida is already running."
+            if [ -n "$(docker ps --format json | jq -r .Names | grep -E 'auth')" ]; then
+                echo "Container auth-server is already running."
             else
-                docker rmi getumbrel/tor
-                docker start gifted_almeida
+                docker start auth
+            fi
+            if [ -n "$(docker ps --format json | jq -r .Names | grep -E 'tor_proxy')" ]; then
+                echo "Container tor_proxy is already running."
+            else
+                docker start tor_proxy
             fi
         else
             echo "UmbrelOS is not installed."
@@ -702,11 +706,15 @@ homeassistant_uninstall() {
 
     # getumbrel Services
     if [ -n "$(docker ps --format json | jq -r .Names | grep -E 'auth|tor_proxy')" ]; then
-        if [ -n "$(docker ps --format json | jq -r .Names | grep -E 'gifted_almeida')" ]; then
-            echo "Container gifted_almeida is already running."
+        if [ -n "$(docker ps --format json | jq -r .Names | grep -E 'auth')" ]; then
+            echo "Container auth-server is already running."
         else
-            docker rmi getumbrel/tor
-            docker start gifted_almeida
+            docker start auth
+        fi
+        if [ -n "$(docker ps --format json | jq -r .Names | grep -E 'tor_proxy')" ]; then
+            echo "Container tor_proxy is already running."
+        else
+            docker start tor_proxy
         fi
     else
         echo "UmbrelOS is not installed."
