@@ -658,6 +658,7 @@ homeassistant_install_supervised() {
         sleep 30
         if [ -n "$(docker ps --format json | jq -r .Names | grep -E 'homeassistant')" ]; then
         echo "Home Assistant containers are expected to start..."
+        apt install -y unzip
         wget -O - https://get.hacs.xyz | bash -
         fi
 
