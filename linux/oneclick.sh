@@ -745,11 +745,15 @@ ollama() {
 
 ollama_install() {
     clear
-    echo "Installing Ollama..."
-    curl -fsSL https://ollama.com/install.sh | sh
-    echo "Ollama installed."
-    sleep 10
-    ollama
+    if [ -x "$(command -v ollama)" ]; then
+        echo "Ollama installed."
+    else
+        echo "Installing Ollama..."
+        curl -fsSL https://ollama.com/install.sh | sh
+        echo "Ollama installed."
+        sleep 10
+        ollama
+    fi
 }
 
 ollama_uninstall() {
@@ -837,13 +841,11 @@ tools_netstat() {
     if [ -x "$(command -v netstat)" ]; then
         netstat -tulpn
     else
-        apt update && apt install -y net-tools
-        if [ -x "$(command -v netstat)" ]; then
-            tools_netstat
-        else
-            echo "Failed to install netstat."
-            exit 1
-        fi
+        echo "Installing Net-tools..."
+        apt install -y net-tools
+        echo "Net-tools installed."
+        sleep 5
+        tools_netstat
     fi
 }
 
@@ -852,6 +854,7 @@ tools_speedtest() {
     if [ -x "$(command -v speedtest)" ]; then
         speedtest
     else
+        echo "Installing Speedtest..."
         # Ensure curl is installed
         if ! [ -x "$(command -v curl)" ]; then
             apt install -y curl
@@ -860,14 +863,9 @@ tools_speedtest() {
         # Install speedtest
         curl -s https://packagecloud.io/install/repositories/ookla/speedtest-cli/script.deb.sh | sudo bash
         apt install -y speedtest
-        
-        # Check if speedtest was installed successfully before re-invoking the function
-        if [ -x "$(command -v speedtest)" ]; then
-            tools_speedtest
-        else
-            echo "Failed to install speedtest."
-            exit 1
-        fi
+        echo "Speedtest installed."
+        sleep 5
+        tools_speedtest
     fi
 }
 
