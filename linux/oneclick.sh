@@ -615,7 +615,7 @@ homeassistant_install() {
 
         # Restart network service
         echo "Restarting network service..."
-        systemctl restart systemd-resolved
+        apt remove -y systemd-resolved
         systemctl restart systemd-networkd.service
         systemctl restart NetworkManager
         sleep 5
@@ -640,7 +640,6 @@ homeassistant_install_supervised() {
         apt install -y ./os-agent_linux_x86_64.deb
         BYPASS_OS_CHECK=true dpkg -i --ignore-depends=systemd-resolved homeassistant-supervised.deb
 
-        apt remove -y systemd-resolved
         rm -fr os-agent_linux_x86_64.deb homeassistant-supervised.deb "$HOMEASSISTANT_INSTALL"
         echo "Home Assistant Supervised installation complete."
         sleep 5
@@ -656,7 +655,7 @@ homeassistant_install_supervised() {
 
         # Restart network service
         echo "Restarting network service..."
-        systemctl restart systemd-resolved
+        apt remove -y systemd-resolved
         systemctl restart systemd-networkd.service
         systemctl restart NetworkManager
         sleep 5
