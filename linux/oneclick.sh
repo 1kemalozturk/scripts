@@ -628,9 +628,6 @@ homeassistant_install_supervised() {
     # Check the status of name resolution
     echo "Checking name resolution..."
     if ping -c 1 checkonline.home-assistant.io &>/dev/null; then
-        apt install -y bluez
-        apt --fix-broken install
-
         # Download and install Home Assistant packages
         wget -O os-agent_linux_x86_64.deb https://github.com/home-assistant/os-agent/releases/latest/download/os-agent_1.6.0_linux_x86_64.deb
         wget -O homeassistant-supervised.deb https://github.com/home-assistant/supervised-installer/releases/latest/download/homeassistant-supervised.deb
@@ -638,6 +635,11 @@ homeassistant_install_supervised() {
         chmod 777 os-agent_linux_x86_64.deb homeassistant-supervised.deb
 
         apt install -y ./os-agent_linux_x86_64.deb
+        BYPASS_OS_CHECK=true dpkg -i --ignore-depends=systemd-resolved homeassistant-supervised.deb
+
+        apt install -y bluez
+        apt --fix-broken install
+
         BYPASS_OS_CHECK=true dpkg -i --ignore-depends=systemd-resolved homeassistant-supervised.deb
 
         rm -fr os-agent_linux_x86_64.deb homeassistant-supervised.deb "$HOMEASSISTANT_INSTALL"
