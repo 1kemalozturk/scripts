@@ -639,7 +639,6 @@ homeassistant_install_supervised() {
             apparmor \
             bluez \
             cifs-utils \
-            curl \
             dbus \
             jq \
             libglib2.0-bin \
@@ -647,31 +646,32 @@ homeassistant_install_supervised() {
             network-manager \
             nfs-common \
             systemd-journal-remote \
-            systemd-resolved \
-            udisks2 \
-            wget -y
+            udisks2 -y
         apt --fix-broken install
 
-        apt remove -y systemd-resolved
+        if [ -x "$(command -v systemd-resolved)" ]; then
+            apt remove -y systemd-resolved
+        fi
+        
         rm -fr os-agent_linux_x86_64.deb homeassistant-supervised.deb "$HOMEASSISTANT_INSTALL"
 
         echo "Home Assistant Hacs services installation..."
-        sleep 30
+        sleep 60
         if [ -n "$(docker ps --format json | jq -r .Names | grep -E 'homeassistant')" ]; then
-        echo "Home Assistant containers are expected to start..."
-        apt install -y unzip
-        wget -O - https://get.hacs.xyz | bash -
+            echo "Home Assistant containers are expected to start..."
+            apt install -y unzip
+            wget -O - https://get.hacs.xyz | bash -
         fi
 
         # getumbrel Services
         if [ -n "$(docker ps --format json | jq -r .Names | grep -E 'auth|tor_proxy')" ]; then
             if [ -n "$(docker ps --format json | jq -r .Names | grep -E 'auth')" ]; then
-                echo "Container auth-server is already running."
+                echo "UmbrelOS Container auth-server is already running."
             else
                 docker start auth
             fi
             if [ -n "$(docker ps --format json | jq -r .Names | grep -E 'tor_proxy')" ]; then
-                echo "Container tor_proxy is already running."
+                echo "UmbrelOS Container tor_proxy is already running."
             else
                 docker start tor_proxy
             fi
