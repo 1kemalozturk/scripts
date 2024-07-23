@@ -652,15 +652,13 @@ homeassistant_install_supervised() {
         if [ -x "$(command -v systemd-resolved)" ]; then
             apt remove -y systemd-resolved
         fi
-        
+
         rm -fr os-agent_linux_x86_64.deb homeassistant-supervised.deb "$HOMEASSISTANT_INSTALL"
 
         echo "Home Assistant Hacs services installation..."
         sleep 60
         if [ -n "$(docker ps --format json | jq -r .Names | grep -E 'homeassistant')" ]; then
-            echo "Home Assistant containers are expected to start..."
-            apt install -y unzip
-            wget -O - https://get.hacs.xyz | bash -
+            homeassistant_install_hacs
         fi
 
         # getumbrel Services
@@ -738,6 +736,16 @@ homeassistant_uninstall() {
     echo "Home Assistant uninstalled."
     sleep 5
     homeassistant
+}
+
+homeassistant_install_hacs() {
+    if [ -x "$(command -v unzip)" ]; then
+        wget -O - https://get.hacs.xyz | bash -
+        return
+    else
+        apt install -y unzip
+        homeassistant_install_hacs
+    fi  
 }
 
 ai() {
