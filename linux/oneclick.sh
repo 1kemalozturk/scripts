@@ -639,6 +639,7 @@ homeassistant_install_supervised() {
             apparmor \
             bluez \
             cifs-utils \
+            curl \
             dbus \
             jq \
             libglib2.0-bin \
@@ -646,7 +647,9 @@ homeassistant_install_supervised() {
             network-manager \
             nfs-common \
             systemd-journal-remote \
-            udisks2 -y
+            systemd-resolved \
+            udisks2 \
+            wget -y
         apt --fix-broken install
 
         if [ -x "$(command -v systemd-resolved)" ]; then
