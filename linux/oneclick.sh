@@ -661,7 +661,9 @@ homeassistant_install_supervised() {
         echo "Home Assistant Hacs services installation... Please wait!"
         sleep 60
         if [ -n "$(docker ps --format json | jq -r .Names | grep -E 'homeassistant')" ]; then
-            homeassistant_install_hacs
+            apt install -y unzip
+            wget -O - https://get.hacs.xyz | bash -
+            ha core restart
         fi
 
         # getumbrel Services
@@ -739,17 +741,6 @@ homeassistant_uninstall() {
     echo "Home Assistant uninstalled."
     sleep 5
     homeassistant
-}
-
-homeassistant_install_hacs() {
-    if [ -x "$(command -v unzip)" ]; then
-        wget -O - https://get.hacs.xyz | bash -
-        ha core restart
-        return
-    else
-        apt install -y unzip
-        homeassistant_install_hacs
-    fi  
 }
 
 ai() {
