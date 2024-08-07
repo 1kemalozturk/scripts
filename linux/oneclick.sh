@@ -571,32 +571,63 @@ homeassistant_install() {
     clear
     echo "Starting Home Assistant Supervised installation..."
 
-    if [ -x "$(command -v docker)" ]; then
-        apt update && sudo apt upgrade -y && sudo apt autoremove -y
-        apt install \
-        apparmor \
-        bluez \
-        cifs-utils \
-        curl \
-        dbus \
-        jq \
-        libglib2.0-bin \
-        lsb-release \
-        network-manager \
-        nfs-common \
-        systemd-journal-remote \
-        systemd-resolved \
-        udisks2 \
-        wget -y
+    # Check the status of name resolution
+    echo "Checking name resolution..."
+    if ping -c 1 checkonline.home-assistant.io &>/dev/null; then
+        echo "Name resolution is working."
+        if [ -x "$(command -v docker)" ]; then
+            apt update && sudo apt upgrade -y && sudo apt autoremove -y
+
+            #Install equivs
+            sudo apt install equivs
+            #Generate a template control file
+            equivs-control systemd-resolved.control
+            #Fix the package name
+            sed -i 's/<package name; defaults to equivs-dummy>/systemd-resolved/g' systemd-resolved.control
+            #Build the package
+            equivs-build systemd-resolved.control
+            #Install it
+            sudo dpkg -i systemd-resolved_1.0_all.deb
+
+            apt install \
+            apparmor \
+            bluez \
+            cifs-utils \
+            curl \
+            dbus \
+            jq \
+            libglib2.0-bin \
+            lsb-release \
+            network-manager \
+            nfs-common \
+            systemd-journal-remote \
+            udisks2 \
+            wget -y
+        else
+            curl -fsSL get.docker.com | sh
+            homeassistant_install
+        fi
+
+        echo "supervised" >"$HOMEASSISTANT_INSTALL"
+        echo "System is restarting..."
+        sleep 5
+        systemctl reboot
     else
-        curl -fsSL get.docker.com | sh
+        echo "Name resolution not working. Starting automatic repair..."
+
+        # Update /etc/systemd/resolved.conf
+        # echo "Updating /etc/systemd/resolved.conf with disabling DNSStubListener..."
+
+        # Use 'sed' to uncomment and set the DNSStubListener options
+        # sed -i 's/^#DNSStubListener=.*/DNSStubListener=no/g' /etc/systemd/resolved.conf
+
+        # Restart network service
+        echo "Restarting network service..."
+        systemctl restart systemd-networkd.service
+        systemctl restart NetworkManager
+        sleep 5
         homeassistant_install
     fi
-
-    echo "supervised" >"$HOMEASSISTANT_INSTALL"
-    echo "System is restarting..."
-    sleep 5
-    systemctl reboot
 }
 
 homeassistant_install_supervised() {
@@ -637,13 +668,13 @@ homeassistant_install_supervised() {
 
         rm -fr os-agent_linux_x86_64.deb homeassistant-supervised.deb "$HOMEASSISTANT_INSTALL"
 
-        echo "Home Assistant Hacs services installation... Please wait!"
-        sleep 60
-        if [ -n "$(docker ps --format json | jq -r .Names | grep -E 'homeassistant')" ]; then
-            apt install -y unzip
-            wget -O - https://get.hacs.xyz | bash -
-            ha core restart
-        fi
+        #echo "Home Assistant Hacs services installation... Please wait!"
+        #sleep 60
+        #if [ -n "$(docker ps --format json | jq -r .Names | grep -E 'homeassistant')" ]; then
+        #    apt install -y unzip
+        #    wget -O - https://get.hacs.xyz | bash -
+        #    ha core restart
+        #fi
 
         # getumbrel Services
         if [ -n "$(docker ps --format json | jq -r .Names | grep -E 'auth|tor_proxy')" ]; then
@@ -668,14 +699,14 @@ homeassistant_install_supervised() {
         echo "Name resolution not working. Starting automatic repair..."
 
         # Update /etc/systemd/resolved.conf
-        echo "Updating /etc/systemd/resolved.conf with disabling DNSStubListener..."
+        # echo "Updating /etc/systemd/resolved.conf with disabling DNSStubListener..."
 
         # Use 'sed' to uncomment and set the DNSStubListener options
-        sed -i 's/^#DNSStubListener=.*/DNSStubListener=no/g' /etc/systemd/resolved.conf
+        # sed -i 's/^#DNSStubListener=.*/DNSStubListener=no/g' /etc/systemd/resolved.conf
 
         # Restart network service
         echo "Restarting network service..."
-        apt remove -y systemd-resolved
+        # apt remove -y systemd-resolved
         systemctl restart systemd-networkd.service
         systemctl restart NetworkManager
         sleep 5
