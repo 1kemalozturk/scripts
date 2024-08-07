@@ -571,53 +571,32 @@ homeassistant_install() {
     clear
     echo "Starting Home Assistant Supervised installation..."
 
-    # Check the status of name resolution
-    echo "Checking name resolution..."
-    if ping -c 1 checkonline.home-assistant.io &>/dev/null; then
-        echo "Name resolution is working."
-        if [ -x "$(command -v docker)" ]; then
-            apt update && sudo apt upgrade -y && sudo apt autoremove -y
-            apt install \
-            apparmor \
-            bluez \
-            cifs-utils \
-            curl \
-            dbus \
-            jq \
-            libglib2.0-bin \
-            lsb-release \
-            network-manager \
-            nfs-common \
-            systemd-journal-remote \
-            systemd-resolved \
-            udisks2 \
-            wget -y
-        else
-            curl -fsSL get.docker.com | sh
-            homeassistant_install
-        fi
-
-        echo "supervised" >"$HOMEASSISTANT_INSTALL"
-        echo "System is restarting..."
-        sleep 5
-        systemctl reboot
+    if [ -x "$(command -v docker)" ]; then
+        apt update && sudo apt upgrade -y && sudo apt autoremove -y
+        apt install \
+        apparmor \
+        bluez \
+        cifs-utils \
+        curl \
+        dbus \
+        jq \
+        libglib2.0-bin \
+        lsb-release \
+        network-manager \
+        nfs-common \
+        systemd-journal-remote \
+        systemd-resolved \
+        udisks2 \
+        wget -y
     else
-        echo "Name resolution not working. Starting automatic repair..."
-
-        # Update /etc/systemd/resolved.conf
-        echo "Updating /etc/systemd/resolved.conf with disabling DNSStubListener..."
-
-        # Use 'sed' to uncomment and set the DNSStubListener options
-        sed -i 's/^#DNSStubListener=.*/DNSStubListener=no/g' /etc/systemd/resolved.conf
-
-        # Restart network service
-        echo "Restarting network service..."
-        apt remove -y systemd-resolved
-        systemctl restart systemd-networkd.service
-        systemctl restart NetworkManager
-        sleep 5
+        curl -fsSL get.docker.com | sh
         homeassistant_install
     fi
+
+    echo "supervised" >"$HOMEASSISTANT_INSTALL"
+    echo "System is restarting..."
+    sleep 5
+    systemctl reboot
 }
 
 homeassistant_install_supervised() {
