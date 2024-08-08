@@ -624,13 +624,15 @@ homeassistant_install_supervised() {
 
     rm -fr os-agent_linux_x86_64.deb homeassistant-supervised.deb "$HOMEASSISTANT_INSTALL"
 
-    echo "Home Assistant Hacs services installation... 2-3 Minute Please wait!"
-    sleep 180
-    if [ -n "$(docker ps --format json | jq -r .Names | grep -E 'homeassistant')" ]; then
-        apt install -y unzip
-        wget -O - https://get.hacs.xyz | bash -
-        ha core restart
-    fi
+    while [ -z "$(docker ps --format json | jq -r .Names | grep -E 'homeassistant')" ]; do
+        echo "Home Assistant container not started, please wait. Checking..."
+        sleep 30 # waits 30 seconds and checks again
+    done
+
+    echo "Home Assistant Hacs services installation..."
+    apt install -y unzip
+    wget -O - https://get.hacs.xyz | bash -
+    ha core restart
 
     # getumbrel Services
     if [ -n "$(docker ps --format json | jq -r .Names | grep -E 'auth|tor_proxy')" ]; then
