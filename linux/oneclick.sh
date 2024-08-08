@@ -121,11 +121,13 @@ developer() {
     clear
     echo "Developer"
     echo "1. Usbip WSL/HYPERV"
+    echo "2. Portainer"
     echo "0. Back"
     echo -n "Choose an option: "
     read choice
     case $choice in
     1) usbip ;;
+    2) portainer;;
     0) show_main ;;
     *)
         echo "Invalid option!"
@@ -221,76 +223,20 @@ usbip_managment() {
 
 usbip_install() {
     clear
-    echo "Usbip Installation"
-    echo "1. Ubuntu"
-    echo "2. Debian"
-    echo "0. Back"
-    echo -n "Choose your OS: "
-    read choice
-
-    case $choice in
-    1)
-        echo "Installing Usbip on Ubuntu..."
-        apt update
-        apt install -y hwdata usbutils linux-tools-virtual
-        update-alternatives --install /usr/local/bin/usbip usbip $(ls /usr/lib/linux-tools/*/usbip | tail -n1) 20
-        modprobe vhci-hcd
-        echo "Usbip installed on Ubuntu."
-        ;;
-    2)
-        echo "Installing Usbip on Debian..."
-        apt update
-        apt install -y hwdata usbutils usbip
-        echo "Usbip installed on Debian."
-        ;;
-    0)
-        show_main
-        return
-        ;;
-    *)
-        echo "Invalid option!"
-        sleep 1
-        usbip_install
-        return
-        ;;
-    esac
+    echo "Usbip is starting the installation..."
+    apt update
+    apt install -y hwdata usbutils usbip
+    echo "Usbip installation complete."
     sleep 10
     usbip
 }
 
 usbip_uninstall() {
     clear
-    echo "Usbip Uninstallation"
-    echo "1. Ubuntu"
-    echo "2. Debian"
-    echo "0. Back"
-    echo -n "Choose your OS: "
-    read choice
-
-    case $choice in
-    1)
-        echo "Uninstalling Usbip on Ubuntu..."
-        apt remove -y hwdata usbutils linux-tools-virtual
-        apt autoremove -y
-        echo "Usbip uninstalled on Ubuntu."
-        ;;
-    2)
-        echo "Uninstalling Usbip on Debian..."
-        apt remove -y hwdata usbutils usbip
-        apt autoremove -y
-        echo "Usbip uninstalled on Debian."
-        ;;
-    0)
-        show_main
-        return
-        ;;
-    *)
-        echo "Invalid option!"
-        sleep 1
-        usbip_install
-        return
-        ;;
-    esac
+    echo "Usbip is being removed..."
+    apt remove -y hwdata usbutils usbip
+    apt autoremove -y
+    echo "Usbip uninstallation completed."
     sleep 10
     usbip
 }
@@ -390,7 +336,7 @@ usbip attach -r "$host_ip" -b "$bus_id"" | tee $script_file >/dev/null
 
 usbip_attach_service_uninstall() {
     clear
-    echo "Removing Usbip-Attach service..."
+    echo "Usbip-Attach service is being removed..."
 
     # Stop the service if it's running
     systemctl stop usbip-attach.service
@@ -418,6 +364,47 @@ usbip_attach_service_status() {
     usbip_managment
 }
 
+portainer() {
+    clear
+    echo "Portainer"
+    echo "1. Install"
+    echo "2. Uninstall"
+    echo "0. Back"
+    echo -n "Choose an option: "
+    read choice
+    case $choice in
+    1) portainer_install ;;
+    2) portainer_uninstall ;;
+    0) show_main ;;
+    *)
+        echo "Invalid option!"
+        sleep 1
+        portainer
+        ;;
+    esac
+}
+
+portainer_install() {
+    clear
+    echo "Portainer is starting the installation..."
+    docker pull portainer/portainer
+    docker run -d -p 9000:9000 --name portainer --restart always -v /var/run/docker.sock:/var/run/docker.sock -v portainer_data:/data portainer/portainer
+    echo "Portainer installation completed."
+    sleep 10
+    portainer
+}
+
+portainer_uninstall() {
+    clear
+    echo "Portainer is being removed..."
+    docker stop portainer
+    docker rm portainer
+    docker volume rm portainer_data
+    echo "Portainer uninstallation completed."
+    sleep 10
+    portainer
+}
+
 3x-ui() {
     clear
     echo "3x-UI"
@@ -440,9 +427,9 @@ usbip_attach_service_status() {
 
 3x-ui_install() {
     clear
-    echo "Installing 3x-UI..."
+    echo "3x-UI is starting the installation..."
     bash <(curl -Ls https://raw.githubusercontent.com/mhsanaei/3x-ui/master/install.sh)
-    echo "3x-UI installed."
+    echo "3x-UI installation completed."
     sleep 10
     3x-ui
 }
@@ -476,22 +463,22 @@ adguardhome() {
 
 adguardhome_install() {
     clear
-    echo "Installing AdguardHome loading..."
+    echo "AdguardHome is starting the installation..."
     curl -s -S -L https://raw.githubusercontent.com/AdguardTeam/AdGuardHome/master/scripts/install.sh | sh -s -- -v
-    echo "AdguardHome installed."
+    echo "AdguardHome installation completed."
     sleep 10
     adguardhome
 }
 
 adguardhome_uninstall() {
     clear
-    echo "Uninstalling AdguardHome..."
+    echo "AdguardHome is being removed..."
     /opt/AdGuardHome/AdGuardHome -s uninstall
     rm -fr /opt/AdGuardHome
     systemctl daemon-reload
     systemctl restart systemd-networkd
     systemctl restart systemd-resolved
-    echo "AdguardHome uninstalled."
+    echo "AdguardHome uninstallation completed."
     sleep 10
     adguardhome
 }
@@ -518,18 +505,18 @@ pi-hole() {
 
 pi-hole_install() {
     clear
-    echo "Installing Pi-hole..."
+    echo "Pi-hole is starting the installation..."
     curl -sSL https://install.pi-hole.net | bash
-    echo "Pi-hole installed."
+    echo "Pi-hole installation completed."
     sleep 10
     pi-hole
 }
 
 pi-hole_uninstall() {
     clear
-    echo "Uninstalling Pi-hole..."
+    echo "Pi-hole is being removed..."
     pihole uninstall
-    echo "Pi-hole uninstalled."
+    echo "Pi-hole uninstallation completed."
     sleep 10
     pi-hole
 }
@@ -569,7 +556,7 @@ homeassistant_install_check() {
 
 homeassistant_install() {
     clear
-    echo "Starting Home Assistant Supervised installation..."
+    echo "Home Assistant Supervised is starting the installation..."
 
     if [ -x "$(command -v docker)" ]; then
         apt update && apt upgrade -y && apt autoremove -y
@@ -647,7 +634,7 @@ homeassistant_install_supervised() {
             docker start tor_proxy
         fi
     else
-        echo "UmbrelOS is not installed."
+        echo "UmbrelOS is not installation completed."
     fi
 
     echo "Home Assistant Supervised installation complete."
@@ -657,7 +644,7 @@ homeassistant_install_supervised() {
 
 homeassistant_uninstall() {
     clear
-    echo "Uninstalling Home Assistant..."
+    echo "Home Assistant is being removed..."
 
     systemctl stop haos-agent >/dev/null 2>&1
     systemctl stop hassio-apparmor >/dev/null 2>&1
@@ -686,10 +673,10 @@ homeassistant_uninstall() {
             docker start tor_proxy
         fi
     else
-        echo "UmbrelOS is not installed."
+        echo "UmbrelOS is not installation completed."
     fi
 
-    echo "Home Assistant uninstalled."
+    echo "Home Assistant uninstallation completed."
     sleep 5
     homeassistant
 }
@@ -739,11 +726,11 @@ ollama() {
 ollama_install() {
     clear
     if [ -x "$(command -v ollama)" ]; then
-        echo "Ollama installed."
+        echo "Ollama is starting the installation..."
     else
         echo "Installing Ollama..."
         curl -fsSL https://ollama.com/install.sh | sh
-        echo "Ollama installed."
+        echo "Ollama installation completed."
         sleep 10
         ollama
     fi
@@ -751,7 +738,7 @@ ollama_install() {
 
 ollama_uninstall() {
     clear
-    echo "Uninstalling Ollama..."
+    echo "Ollama is being removed..."
     systemctl stop ollama
     systemctl disable ollama
     rm /etc/systemd/system/ollama.service
@@ -766,7 +753,7 @@ ollama_uninstall() {
     rm -r /usr/share/ollama
     userdel ollama
     groupdel ollama
-    echo "Ollama Uninstalled."
+    echo "Ollama uninstallation completed."
     sleep 10
     ollama
 }
@@ -834,9 +821,9 @@ tools_netstat() {
     if [ -x "$(command -v netstat)" ]; then
         netstat -tulpn
     else
-        echo "Installing Net-tools..."
+        echo "Net-tools is starting the installation..."
         apt install -y net-tools
-        echo "Net-tools installed."
+        echo "Net-tools installation completed."
         sleep 5
         tools_netstat
     fi
@@ -847,7 +834,7 @@ tools_speedtest() {
     if [ -x "$(command -v speedtest)" ]; then
         speedtest
     else
-        echo "Installing Speedtest..."
+        echo "Speedtest is starting the installation..."
         # Ensure curl is installed
         if ! [ -x "$(command -v curl)" ]; then
             apt install -y curl
@@ -856,7 +843,7 @@ tools_speedtest() {
         # Install speedtest
         curl -s https://packagecloud.io/install/repositories/ookla/speedtest-cli/script.deb.sh | sudo bash
         apt install -y speedtest
-        echo "Speedtest installed."
+        echo "Speedtest installation completed."
         sleep 5
         tools_speedtest
     fi
