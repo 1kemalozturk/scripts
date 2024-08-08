@@ -51,8 +51,6 @@ show_main() {
     echo "2. Networking"
     echo "3. Home & Automation"
     echo "4. AI"
-    echo "5. Tools"
-    echo "6. Troubleshooting"
     echo "0. Exit Script"
     echo -n "Choose an option: "
     read choice
@@ -61,8 +59,6 @@ show_main() {
     2) networking ;;
     3) home_automation ;;
     4) ai ;;
-    5) tools ;;
-    6) troubleshooting ;;
     0) exit 0 ;;
     *)
         echo "Invalid option!"
@@ -792,103 +788,6 @@ open-webui_uninstall() {
 
     sleep 10
     open-webui
-}
-
-tools() {
-    clear
-    echo "Tools"
-    echo "1. Netstat"
-    echo "2. Speedtest"
-    echo "3. IPerf3"
-    echo "0. Back"
-    echo -n "Choose an option: "
-    read choice
-    case $choice in
-    1) tools_netstat ;;
-    2) tools_speedtest ;;
-    3) tools_iperf3 ;;
-    0) show_main ;;
-    *)
-        echo "Invalid option!"
-        sleep 1
-        tools
-        ;;
-    esac
-}
-
-tools_netstat() {
-    clear
-    if [ -x "$(command -v netstat)" ]; then
-        netstat -tulpn
-    else
-        echo "Net-tools is starting the installation..."
-        apt install -y net-tools
-        echo "Net-tools installation completed."
-        sleep 5
-        tools_netstat
-    fi
-}
-
-tools_speedtest() {
-    clear
-    if [ -x "$(command -v speedtest)" ]; then
-        speedtest
-    else
-        echo "Speedtest is starting the installation..."
-        # Ensure curl is installed
-        if ! [ -x "$(command -v curl)" ]; then
-            apt install -y curl
-        fi
-        
-        # Install speedtest
-        curl -s https://packagecloud.io/install/repositories/ookla/speedtest-cli/script.deb.sh | sudo bash
-        apt install -y speedtest
-        echo "Speedtest installation completed."
-        sleep 5
-        tools_speedtest
-    fi
-}
-
-troubleshooting() {
-    clear
-    echo "Troubleshooting"
-    echo "1. Cleaner"
-    echo "2. DPKG Repair"
-    echo "0. Back"
-    echo -n "Choose an option: "
-    read choice
-    case $choice in
-    1) troubleshooting_monitor_uninstall ;;
-    2) troubleshooting_dpkg_repair ;;
-    0) show_main ;;
-    *)
-        echo "Invalid option!"
-        sleep 1
-        troubleshooting
-        ;;
-    esac
-}
-
-# Function to monitor for package removal events
-troubleshooting_cleaner() {
-    clear
-
-    # Remove configuration files
-    apt-get autoremove --purge -y
-    apt-get clean
-
-    sleep 10
-    troubleshooting
-}
-troubleshooting_dpkg_repair() {
-    clear
-    dpkg --force-all --configure -a
-
-    # dpkg: error: 2 expected programs not found in PATH or not executable
-    apt --fix-broken install
-
-    sleep 10
-    troubleshooting
 }
 
 check_for_updates
