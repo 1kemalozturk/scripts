@@ -571,80 +571,9 @@ homeassistant_install() {
     clear
     echo "Starting Home Assistant Supervised installation..."
 
-    # Check the status of name resolution
-    echo "Checking name resolution..."
-    if ping -c 1 checkonline.home-assistant.io &>/dev/null; then
-        echo "Name resolution is working."
-        if [ -x "$(command -v docker)" ]; then
-            apt update && sudo apt upgrade -y && sudo apt autoremove -y
+    if [ -x "$(command -v docker)" ]; then
+        apt update && apt upgrade -y && apt autoremove -y
 
-            #Install equivs
-            sudo apt install equivs
-            #Generate a template control file
-            equivs-control systemd-resolved.control
-            #Fix the package name
-            sed -i 's/<package name; defaults to equivs-dummy>/systemd-resolved/g' systemd-resolved.control
-            #Build the package
-            equivs-build systemd-resolved.control
-            #Install it
-            sudo dpkg -i systemd-resolved_1.0_all.deb
-
-            apt install \
-            apparmor \
-            bluez \
-            cifs-utils \
-            curl \
-            dbus \
-            jq \
-            libglib2.0-bin \
-            lsb-release \
-            network-manager \
-            nfs-common \
-            systemd-journal-remote \
-            udisks2 \
-            wget -y
-        else
-            curl -fsSL get.docker.com | sh
-            homeassistant_install
-        fi
-
-        echo "supervised" >"$HOMEASSISTANT_INSTALL"
-        echo "System is restarting..."
-        sleep 5
-        systemctl reboot
-    else
-        echo "Name resolution not working. Starting automatic repair..."
-
-        # Update /etc/systemd/resolved.conf
-        # echo "Updating /etc/systemd/resolved.conf with disabling DNSStubListener..."
-
-        # Use 'sed' to uncomment and set the DNSStubListener options
-        # sed -i 's/^#DNSStubListener=.*/DNSStubListener=no/g' /etc/systemd/resolved.conf
-
-        # Restart network service
-        echo "Restarting network service..."
-        systemctl restart systemd-networkd.service
-        systemctl restart NetworkManager
-        sleep 5
-        homeassistant_install
-    fi
-}
-
-homeassistant_install_supervised() {
-    clear
-    # Check the status of name resolution
-    echo "Checking name resolution..."
-    if ping -c 1 checkonline.home-assistant.io &>/dev/null; then
-        # Download and install Home Assistant packages
-        wget -O os-agent_linux_x86_64.deb https://github.com/home-assistant/os-agent/releases/latest/download/os-agent_1.6.0_linux_x86_64.deb
-        wget -O homeassistant-supervised.deb https://github.com/home-assistant/supervised-installer/releases/latest/download/homeassistant-supervised.deb
-
-        chmod 777 os-agent_linux_x86_64.deb homeassistant-supervised.deb
-
-        apt install -y ./os-agent_linux_x86_64.deb
-        BYPASS_OS_CHECK=true dpkg -i --ignore-depends=systemd-resolved homeassistant-supervised.deb
-
-        apt update && sudo apt upgrade -y && sudo apt autoremove -y
         apt install \
             apparmor \
             bluez \
@@ -657,61 +586,71 @@ homeassistant_install_supervised() {
             network-manager \
             nfs-common \
             systemd-journal-remote \
-            systemd-resolved \
             udisks2 \
             wget -y
-        apt --fix-broken install
 
-        if [ -x "$(command -v systemd-resolved)" ]; then
-            apt remove -y systemd-resolved
-        fi
-
-        rm -fr os-agent_linux_x86_64.deb homeassistant-supervised.deb "$HOMEASSISTANT_INSTALL"
-
-        #echo "Home Assistant Hacs services installation... Please wait!"
-        #sleep 60
-        #if [ -n "$(docker ps --format json | jq -r .Names | grep -E 'homeassistant')" ]; then
-        #    apt install -y unzip
-        #    wget -O - https://get.hacs.xyz | bash -
-        #    ha core restart
-        #fi
-
-        # getumbrel Services
-        if [ -n "$(docker ps --format json | jq -r .Names | grep -E 'auth|tor_proxy')" ]; then
-            if [ -n "$(docker ps --format json | jq -r .Names | grep -E 'auth')" ]; then
-                echo "UmbrelOS Container auth-server is already running."
-            else
-                docker start auth
-            fi
-            if [ -n "$(docker ps --format json | jq -r .Names | grep -E 'tor_proxy')" ]; then
-                echo "UmbrelOS Container tor_proxy is already running."
-            else
-                docker start tor_proxy
-            fi
-        else
-            echo "UmbrelOS is not installed."
-        fi
-
-        echo "Home Assistant Supervised installation complete."
-        sleep 5
-        homeassistant
+        #Install equivs
+        apt install equivs -y
+        #Generate a template control file
+        equivs-control systemd-resolved.control
+        #Fix the package name
+        sed -i 's/<package name; defaults to equivs-dummy>/systemd-resolved/g' systemd-resolved.control
+        #Build the package
+        equivs-build systemd-resolved.control
+        #Install it
+        dpkg -i systemd-resolved_1.0_all.deb
     else
-        echo "Name resolution not working. Starting automatic repair..."
-
-        # Update /etc/systemd/resolved.conf
-        # echo "Updating /etc/systemd/resolved.conf with disabling DNSStubListener..."
-
-        # Use 'sed' to uncomment and set the DNSStubListener options
-        # sed -i 's/^#DNSStubListener=.*/DNSStubListener=no/g' /etc/systemd/resolved.conf
-
-        # Restart network service
-        echo "Restarting network service..."
-        # apt remove -y systemd-resolved
-        systemctl restart systemd-networkd.service
-        systemctl restart NetworkManager
-        sleep 5
-        homeassistant_install_supervised
+        curl -fsSL get.docker.com | sh
+        homeassistant_install
     fi
+
+    echo "supervised" >"$HOMEASSISTANT_INSTALL"
+    echo "System is restarting..."
+    sleep 5
+    systemctl reboot
+}
+
+homeassistant_install_supervised() {
+    clear
+
+    # Download and install Home Assistant packages
+    wget -O os-agent_linux_x86_64.deb https://github.com/home-assistant/os-agent/releases/latest/download/os-agent_1.6.0_linux_x86_64.deb
+    wget -O homeassistant-supervised.deb https://github.com/home-assistant/supervised-installer/releases/latest/download/homeassistant-supervised.deb
+
+    chmod 777 os-agent_linux_x86_64.deb homeassistant-supervised.deb
+
+    apt install -y ./os-agent_linux_x86_64.deb
+    BYPASS_OS_CHECK=true dpkg -i --ignore-depends=systemd-resolved homeassistant-supervised.deb
+
+    rm -fr os-agent_linux_x86_64.deb homeassistant-supervised.deb "$HOMEASSISTANT_INSTALL"
+
+    echo "Home Assistant Hacs services installation... 2-3 Minute Please wait!"
+    sleep 180
+    if [ -n "$(docker ps --format json | jq -r .Names | grep -E 'homeassistant')" ]; then
+        apt install -y unzip
+        wget -O - https://get.hacs.xyz | bash -
+        ha core restart
+    fi
+
+    # getumbrel Services
+    if [ -n "$(docker ps --format json | jq -r .Names | grep -E 'auth|tor_proxy')" ]; then
+        if [ -n "$(docker ps --format json | jq -r .Names | grep -E 'auth')" ]; then
+            echo "UmbrelOS Container auth-server is already running."
+        else
+            docker start auth
+        fi
+        if [ -n "$(docker ps --format json | jq -r .Names | grep -E 'tor_proxy')" ]; then
+            echo "UmbrelOS Container tor_proxy is already running."
+        else
+            docker start tor_proxy
+        fi
+    else
+        echo "UmbrelOS is not installed."
+    fi
+
+    echo "Home Assistant Supervised installation complete."
+    sleep 5
+    homeassistant
 }
 
 homeassistant_uninstall() {
