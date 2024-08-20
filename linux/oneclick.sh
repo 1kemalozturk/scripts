@@ -617,6 +617,9 @@ homeassistant_install_supervised() {
     wget -O - https://get.hacs.xyz | bash -
     ha core restart
 
+    # 'HomeAssistantCore.update' blocked from execution, system is not healthy - docker #82049
+    ha jobs options --ignore-conditions healthy
+
     # getumbrel Services
     if [ -n "$(docker ps --format json | jq -r .Names | grep -E 'auth|tor_proxy')" ]; then
         if [ -n "$(docker ps --format json | jq -r .Names | grep -E 'auth')" ]; then
