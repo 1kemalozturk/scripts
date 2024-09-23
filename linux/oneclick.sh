@@ -117,13 +117,17 @@ developer() {
     clear
     echo "Developer"
     echo "1. Usbip WSL/HYPERV"
-    echo "2. Portainer"
+    echo "2. NVM"
+    echo "3. My Server Status"
+    echo "4. Portainer"
     echo "0. Back"
     echo -n "Choose an option: "
     read choice
     case $choice in
     1) usbip ;;
-    2) portainer;;
+    2) nvm_sh ;;
+    3) my_server_status_api ;;
+    4) portainer;;
     0) show_main ;;
     *)
         echo "Invalid option!"
@@ -358,6 +362,84 @@ usbip_attach_service_status() {
     systemctl status usbip-attach.service
     sleep 10
     usbip_managment
+}
+
+nvm_sh() {
+    clear
+    echo "NVM"
+    echo "1. Install"
+    echo "2. Uninstall"
+    echo "0. Back"
+    echo -n "Choose an option: "
+    read choice
+    case $choice in
+    1) nvm_sh_install ;;
+    2) nvm_sh_uninstall ;;
+    0) show_main ;;
+    *)
+        echo "Invalid option!"
+        sleep 1
+        nvm_sh
+        ;;
+    esac
+}
+
+nvm_sh_install() {
+    clear
+    echo "NVM is starting the installation..."
+    curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.1/install.sh | bash
+    export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
+    [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
+    source ~/.bashrc
+    nvm install node
+    nvm use node
+    nvm -v
+    node -v
+    echo "NVM installation completed."
+    sleep 10
+    nvm_sh
+}
+
+nvm_sh_uninstall() {
+    clear
+    sleep 10
+    nvm_sh
+}
+
+my_server_status_api() {
+    clear
+    echo "My Server Status Api"
+    echo "1. Install"
+    echo "2. Uninstall"
+    echo "3. Managment"
+    echo "0. Back"
+    echo -n "Choose an option: "
+    read choice
+    case $choice in
+    1) my_server_status_api_install ;;
+    2) my_server_status_api_uninstall ;;
+    0) show_main ;;
+    *)
+        echo "Invalid option!"
+        sleep 1
+        my_server_status_api
+        ;;
+    esac
+}
+
+my_server_status_api_install() {
+    clear
+    echo "My Server Status Api is starting the installation..."
+
+    echo "My Server Status Api installation completed."
+    sleep 10
+    my_server_status_api
+}
+
+my_server_status_api_uninstall() {
+    clear
+    sleep 10
+    my_server_status_api
 }
 
 portainer() {
